@@ -1,23 +1,14 @@
 {
-  "name": "latency-lab",
+  "name": "latency-lab-root",
   "version": "1.0.0",
-  "description": "��#\u0000 \u0000L\u0000a\u0000t\u0000e\u0000n\u0000c\u0000y\u0000 \u0000L\u0000a\u0000b\u0000\r\u0000 \u0000",
-  "main": "index.js",
+  "description": "Performance audit engine for Shopify stores",
+  "private": true,
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start-backend": "npm start --prefix backend",
+    "start-frontend": "npm start --prefix frontend",
+    "dev": "concurrently \"npm run start-backend\" \"npm run start-frontend\""
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/manavkr0710/latency-lab.git"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/manavkr0710/latency-lab/issues"
-  },
-  "homepage": "https://github.com/manavkr0710/latency-lab#readme",
-  "dependencies": {
-    "puppeteer": "^24.40.0"
+  "devDependencies": {
+    "concurrently": "^9.0.0"
   }
 }
