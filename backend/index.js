@@ -14,7 +14,7 @@ const puppeteer = require('puppeteer');
   const browser = await puppeteer.launch({ headless: true });
   const page = await browser.newPage();
   
-  const url = 'https://www.rhodeskin.com/'; 
+  const url = 'https://themes.shopify.com/themes/horizon/presets/horizon'; 
 
   const firstPartyDomains = [
     'shopify.com',
@@ -56,7 +56,14 @@ const puppeteer = require('puppeteer');
   
   const villains = [...new Set(report.thirdParty.map(src => new URL(src).hostname))];
   console.log(`\nTop 3rd-Party App Domains:`);
-  villains.slice(0, 10).forEach(domain => console.log(`- ${domain}`));
+
+  if (villains.length == 0) {
+    console.log("None to display")
+  }
+  else{
+      villains.slice(0, 10).forEach(domain => console.log(`- ${domain}`));
+
+  }
 
   await browser.close();
 })();
