@@ -60,6 +60,10 @@ const puppeteer = require('puppeteer');
 
   console.log(`Auditing scripts on ${url}...`); 
   
+  //tell browser to go to url
+  //networkidle2 tells puppeteer to wait until there are no more than 2 
+  //active network connections, to ensure all the sneaky apps that load late
+  //are caught
   await page.goto(url, { waitUntil: 'networkidle2' });
 
   console.log(`\n--- Audit Results for ${url} ---`);
@@ -73,6 +77,9 @@ console.log(`\nTop 3rd-Party App Domains:`);
 if (uniqueVillains.length === 0) {
   console.log("None to display");
 } else {
+
+  //displaying "wall of shame", sorting slowest scripts at the top
+  //filter for dups
   const sortedVillains = report.thirdParty
     .sort((a, b) => b.ms - a.ms)
     .filter((v, i, a) => a.findIndex(t => t.hostname === v.hostname) === i);
@@ -80,6 +87,8 @@ if (uniqueVillains.length === 0) {
   console.log(`Hostname`.padEnd(30) + `| Latency (ms)`);
   console.log(`-`.repeat(45));
 
+
+  //displaying final res to the terminal 
   sortedVillains.slice(0, 10).forEach(app => {
     console.log(`${app.hostname.padEnd(30)} | ${app.ms.toFixed(2)}ms`);
   });
