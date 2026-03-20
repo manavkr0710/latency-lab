@@ -10,15 +10,45 @@ const puppeteer = require('puppeteer');
 
 // define the root route to test if the server is awake
 fastify.get('/audit', async (request, reply) => {
-  const { url } = request.query;
+  const targetUrl = request.query.url;
+  const browser = await puppeteer.launch({ headless: "new" });
+  const page = await browser.newPage();
   
-  if (!url) {
-    return reply.code(400).send({ error: 'URL query parameter is required' });
-  }
+  const report = { firstParty: 0, thirdParty: [] };
+  const firstPartyDomains = ['shopify.com', 'shopifycdn.com', 'myshopify.com'];
 
-  return { message: `Audit request received for ${url}`, status: 'pending' };
+  await page.setRequestInterception(true);
+  page.on('request', (req) => req.continue());
+
+  
+  page.on('requestfinished', async (req) => {
+    if (req.resourceType() === 'script') {
+      const res = await req.response();
+      if (res) {
+        const timing = res.timing();
+        const latency = timing ? timing.receiveHeadersEnd : 0;
+        const scriptUrl = req.url();
+        const hostname = new URL(scriptUrl).hostname;
+
+        if (!firstPartyDomains.some(d => scriptUrl.includes(d)) && !targetUrl.includes(hostname)) {
+          report.thirdParty.push({ hostname, ms: latency });
+        } else {
+          report.firstParty++;
+        }
+      }
+    }
+  });
+
+  await page.goto(targetUrl, { waitUntil: 'networkidle2' });
+  await browser.close();
+
+  // Return data as JSON for the frontend
+  return {
+    site: targetUrl,
+    summary: { core: report.firstParty, apps: report.thirdParty.length },
+    slowestApps: report.thirdParty.sort((a, b) => b.ms - a.ms).slice(0, 10)
+  };
 });
-
 // start the server
 const start = async () => {
   try {
