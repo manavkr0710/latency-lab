@@ -9,8 +9,14 @@ const fastify = require('fastify')({ logger: true });
 const puppeteer = require('puppeteer');
 
 // define the root route to test if the server is awake
-fastify.get('/', async (request, reply) => {
-  return { status: 'Latency-Lab API is online' };
+fastify.get('/audit', async (request, reply) => {
+  const { url } = request.query;
+  
+  if (!url) {
+    return reply.code(400).send({ error: 'URL query parameter is required' });
+  }
+
+  return { message: `Audit request received for ${url}`, status: 'pending' };
 });
 
 // start the server
