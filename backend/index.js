@@ -14,7 +14,7 @@ const puppeteer = require('puppeteer');
   const browser = await puppeteer.launch({ headless: true });
   const page = await browser.newPage();
   
-  const url = 'https://themes.shopify.com/themes/horizon/presets/horizon'; 
+  const url = 'https://www.gymshark.com/'; 
 
   const firstPartyDomains = [
     'shopify.com',
@@ -29,21 +29,33 @@ const puppeteer = require('puppeteer');
     thirdParty: []
   };
 
-  await page.setRequestInterception(true); // wiretap
+  await page.setRequestInterception(true);
+  page.on('request', (request) => request.continue());
 
-  page.on('request', (request) => {
-    if (request.resourceType() === 'script') // filter cond to figure out app files that are slowing down a phone's processor
-     {
-      const scriptUrl = request.url();
-      const isFirstParty = firstPartyDomains.some(domain => scriptUrl.includes(domain));
-      
-      if (isFirstParty) {
-        report.firstParty.push(scriptUrl);
-      } else {
-        report.thirdParty.push(scriptUrl);
+  // Listen for when the download finishes to get the timing
+  page.on('requestfinished', async (request) => {
+    if (request.resourceType() === 'script')// filter cond to figure out app files that are slowing down a phone's processor
+      {
+      const response = await request.response();
+      if (response) {
+        const timing = response.timing();
+        // receiveHeadersEnd tells us how long the network took to deliver the file
+        const latency = timing ? timing.receiveHeadersEnd : 0;
+        const scriptUrl = request.url();
+
+        const isFirstParty = firstPartyDomains.some(domain => scriptUrl.includes(domain));
+        
+        if (!isFirstParty) {
+          // We are now pushing an obj instead of just a str
+          report.thirdParty.push({
+            hostname: new URL(scriptUrl).hostname,
+            ms: latency
+          });
+        } else {
+          report.firstParty.push(scriptUrl);
+        }
       }
     }
-    request.continue();
   });
 
   console.log(`Auditing scripts on ${url}...`); 
@@ -54,7 +66,7 @@ const puppeteer = require('puppeteer');
   console.log(` Shopify/Core Scripts: ${report.firstParty.length}`);
   console.log(`Third-Party App Scripts: ${report.thirdParty.length}`);
   
-  const villains = [...new Set(report.thirdParty.map(src => new URL(src).hostname))];
+const villains = [...new Set(report.thirdParty.map(item => item.hostname))];
   console.log(`\nTop 3rd-Party App Domains:`);
 
   if (villains.length == 0) {
