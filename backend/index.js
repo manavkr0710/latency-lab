@@ -11,7 +11,19 @@ const puppeteer = require('puppeteer');
 // define the root route to test if the server is awake
 fastify.get('/audit', async (request, reply) => {
   const targetUrl = request.query.url;
-  const browser = await puppeteer.launch({ headless: "new" });
+
+  if (!targetUrl || targetUrl.trim() === "") {
+    return reply.status(400).send({ 
+      success: false, 
+      error: 'Bad Request', 
+      message: 'Please provide a URL. Example: /audit?url=https://gymshark.com' 
+    });
+  }
+
+  let browser; 
+
+  try{
+    browser = await puppeteer.launch({ headless: "new" });
   const page = await browser.newPage();
   
   const report = { firstParty: 0, thirdParty: [] };
@@ -42,13 +54,24 @@ fastify.get('/audit', async (request, reply) => {
   await page.goto(targetUrl, { waitUntil: 'networkidle2' });
   await browser.close();
 
-  // Return data as JSON for the frontend
+  // return data as JSON for the frontend
   return {
     site: targetUrl,
     summary: { core: report.firstParty, apps: report.thirdParty.length },
     slowestApps: report.thirdParty.sort((a, b) => b.ms - a.ms).slice(0, 10)
   };
+  } catch (error) {
+   
+    if (browser) await browser.close();
+    
+    fastify.log.error(error); //error log
+    return reply.code(500).send({ 
+      error: 'Audit failed', 
+      message: error.message 
+    });
+  }
 });
+
 // start the server
 const start = async () => {
   try {
