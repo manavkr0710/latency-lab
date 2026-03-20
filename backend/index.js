@@ -3,9 +3,12 @@
 scans the amount of 3rd party resource types to figure out how much 
  app bloat a merchant's shopify website has 
  
-- what to add: fastify api setup
 */
 const fastify = require('fastify')({ logger: true });
+
+fastify.register(require('@fastify/cors'), { 
+  origin: "*" //frontend will talk to this api
+});
 const puppeteer = require('puppeteer');
 
 // define the root route to test if the server is awake
