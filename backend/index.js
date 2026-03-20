@@ -66,16 +66,24 @@ const puppeteer = require('puppeteer');
   console.log(` Shopify/Core Scripts: ${report.firstParty.length}`);
   console.log(`Third-Party App Scripts: ${report.thirdParty.length}`);
   
-const villains = [...new Set(report.thirdParty.map(item => item.hostname))];
-  console.log(`\nTop 3rd-Party App Domains:`);
+const uniqueVillains = [...new Set(report.thirdParty.map(item => item.hostname))];
 
-  if (villains.length == 0) {
-    console.log("None to display")
-  }
-  else{
-      villains.slice(0, 10).forEach(domain => console.log(`- ${domain}`));
+console.log(`\nTop 3rd-Party App Domains:`);
 
-  }
+if (uniqueVillains.length === 0) {
+  console.log("None to display");
+} else {
+  const sortedVillains = report.thirdParty
+    .sort((a, b) => b.ms - a.ms)
+    .filter((v, i, a) => a.findIndex(t => t.hostname === v.hostname) === i);
+
+  console.log(`Hostname`.padEnd(30) + `| Latency (ms)`);
+  console.log(`-`.repeat(45));
+
+  sortedVillains.slice(0, 10).forEach(app => {
+    console.log(`${app.hostname.padEnd(30)} | ${app.ms.toFixed(2)}ms`);
+  });
+}
 
   await browser.close();
 })();
