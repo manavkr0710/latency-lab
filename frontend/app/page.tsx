@@ -72,14 +72,15 @@ export default function Home() {
               <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex items-center justify-between">
                 <div>
                   <p className="text-sm text-slate-500 font-semibold uppercase italic">Total Third-Party Apps</p>
-                  <h3 className="text-3xl font-black text-slate-900">{results.summary.apps}</h3>
+                  <h3 className="text-3xl font-black text-slate-900">{results?.summary?.apps || 0}</h3>
+                  
                 </div>
                 <AlertTriangle size={40} className="text-amber-500 opacity-20" />
               </div>
               <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex items-center justify-between">
                 <div>
                   <p className="text-sm text-slate-500 font-semibold uppercase italic">Slowest App Latency</p>
-                  <h3 className="text-3xl font-black text-red-600">{results.slowestApps[0]?.ms}ms</h3>
+                  <h3 className="text-3xl font-black text-red-600">{results?.slowestApps?.[0]?.ms || 0}ms</h3>
                 </div>
                 <Zap size={40} className="text-red-500 opacity-20" />
               </div>

@@ -13,7 +13,7 @@ const puppeteer = require('puppeteer');
 
 // define the root route to test if the server is awake
 fastify.get('/audit', async (request, reply) => {
-  const targetUrl = request.query.url;
+  let targetUrl = request.query.url;
 
   if (!targetUrl || targetUrl.trim() === "") {
     return reply.status(400).send({ 
@@ -21,6 +21,9 @@ fastify.get('/audit', async (request, reply) => {
       error: 'Bad Request', 
       message: 'Please provide a URL. Example: /audit?url=https://gymshark.com' 
     });
+  }
+  if (!targetUrl.startsWith('http')) {
+    targetUrl = `https://${targetUrl}`;
   }
 
   let browser; 
