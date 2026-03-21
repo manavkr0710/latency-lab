@@ -1,6 +1,6 @@
 "use client";
 import { useState } from 'react';
-import { Search, Zap, AlertTriangle, Globe, Activity, Info } from 'lucide-react';
+import { Search, Zap, AlertTriangle, Globe, Activity, Info, BarChart3, TrendingDown, MousePointer2 } from 'lucide-react';
 
 export default function Home() {
   const [url, setUrl] = useState('');
@@ -8,10 +8,8 @@ export default function Home() {
   const [results, setResults] = useState<any>(null);
 
   const calculateRevenueLoss = (latency: number) => {
-    // Industry Benchmark: 1 second (1000ms) of lag = 10% conversion drop
+    // 1 second (1000ms) of lag = 10% conversion drop
     const impactPercentage = (latency / 1000) * 0.10;
-    
-    // Monthly baseline revenue for a mid-market Shopify store
     const monthlyBaseline = 100000; 
     const monthlyLoss = monthlyBaseline * impactPercentage;
     
@@ -50,19 +48,52 @@ export default function Home() {
       </nav>
 
       <div className="max-w-6xl mx-auto py-12 px-6 space-y-12">
-        {/* Search Section */}
-        <section className="text-center space-y-6">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-xs font-bold uppercase tracking-widest animate-pulse">
-              <Activity size={14} /> System Online: Puppeteer Engine Active
+        {/* Search & Hook Section */}
+        <section className="text-center space-y-10">
+          <div className="space-y-6">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-xs font-bold uppercase tracking-widest animate-pulse">
+                <Activity size={14} /> System Online: Puppeteer Engine Active
+            </div>
+            <h2 className="text-6xl font-black text-white leading-tight tracking-tight">
+              Stop losing sales to <span className="text-blue-500">App Bloat</span>
+            </h2>
+            <p className="text-xl text-slate-400 max-w-2xl mx-auto font-medium">
+              Every <span className="text-white font-bold">100ms</span> of latency costs e-commerce brands <span className="text-red-500 font-bold">1% in conversions.</span>
+            </p>
           </div>
-          <h2 className="text-5xl font-extrabold text-white leading-tight">
-            Stop losing sales to <span className="text-blue-500">App Bloat</span>
-          </h2>
-          <p className="text-lg text-slate-400 max-w-2xl mx-auto">
-            Analyze any Shopify store to identify 3rd-party scripts slowing down your customer experience.
-          </p>
+
+          {/* THE BIG HOOK: Industry Benchmarks */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-4xl mx-auto">
+            <div className="bg-white/5 border border-white/10 p-4 rounded-2xl backdrop-blur-sm flex items-center gap-4 text-left">
+              <div className="bg-blue-500/20 p-2 rounded-lg text-blue-400">
+                <BarChart3 size={20} />
+              </div>
+              <div>
+                <p className="text-[10px] uppercase tracking-widest text-slate-500 font-bold">Akamai Data</p>
+                <p className="text-sm font-semibold text-slate-200">1s Delay = 7% Drop in Sales</p>
+              </div>
+            </div>
+            <div className="bg-white/5 border border-white/10 p-4 rounded-2xl backdrop-blur-sm flex items-center gap-4 text-left">
+              <div className="bg-red-500/20 p-2 rounded-lg text-red-400">
+                <TrendingDown size={20} />
+              </div>
+              <div>
+                <p className="text-[10px] uppercase tracking-widest text-slate-500 font-bold">Google Study</p>
+                <p className="text-sm font-semibold text-slate-200">53% Bounce rate after 3s</p>
+              </div>
+            </div>
+            <div className="bg-white/5 border border-white/10 p-4 rounded-2xl backdrop-blur-sm flex items-center gap-4 text-left">
+              <div className="bg-green-500/20 p-2 rounded-lg text-green-400">
+                <MousePointer2 size={20} />
+              </div>
+              <div>
+                <p className="text-[10px] uppercase tracking-widest text-slate-500 font-bold">Amazon Metric</p>
+                <p className="text-sm font-semibold text-slate-200">100ms lag = 1% Revenue Loss</p>
+              </div>
+            </div>
+          </div>
           
-          <div className="max-w-2xl mx-auto relative flex items-center group">
+          <div className="max-w-2xl mx-auto relative flex items-center group pt-4">
             <Globe className="absolute left-4 text-slate-500 group-focus-within:text-blue-500 transition-colors" size={20} />
             <input
               type="text"
@@ -74,7 +105,7 @@ export default function Home() {
             <button 
               onClick={startAudit}
               disabled={loading}
-              className="absolute right-2 bg-blue-600 text-white px-8 py-2.5 rounded-xl font-bold hover:bg-blue-700 transition-all flex items-center gap-2 disabled:bg-slate-700 disabled:text-slate-400"
+              className="absolute right-2 bg-blue-600 text-white px-8 py-2.5 rounded-xl font-bold hover:bg-blue-700 transition-all flex items-center gap-2 disabled:bg-slate-700 disabled:text-slate-400 shadow-lg"
             >
               {loading ? <Activity className="animate-spin" size={18} /> : <Search size={18} />}
               {loading ? 'Analyzing...' : 'Analyze'}
@@ -86,8 +117,7 @@ export default function Home() {
         {results && (
           <div className="animate-in fade-in slide-in-from-bottom-4 duration-700 space-y-8">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {/* Total Apps */}
-              <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex items-center justify-between transition-all">
+              <div className="bg-white p-6 rounded-3xl shadow-sm border border-slate-100 flex items-center justify-between transition-all">
                 <div>
                   <p className="text-xs text-slate-500 font-bold uppercase tracking-wider mb-1">Total Third-Party Apps</p>
                   <h3 className="text-4xl font-black text-slate-900">{results?.summary?.apps || 0}</h3>
@@ -97,8 +127,7 @@ export default function Home() {
                 </div>
               </div>
 
-              {/* Slowest App */}
-              <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex items-center justify-between transition-all">
+              <div className="bg-white p-6 rounded-3xl shadow-sm border border-slate-100 flex items-center justify-between transition-all">
                 <div>
                   <p className="text-xs text-slate-500 font-bold uppercase tracking-wider mb-1">Slowest App Latency</p>
                   <h3 className="text-4xl font-black text-red-600">{results?.slowestApps?.[0]?.ms || 0}ms</h3>
@@ -108,8 +137,7 @@ export default function Home() {
                 </div>
               </div>
 
-              {/* Revenue Loss */}
-              <div className="bg-white p-6 rounded-2xl shadow-sm border border-red-100 flex items-center justify-between group relative transition-all">
+              <div className="bg-white p-6 rounded-3xl shadow-sm border border-red-100 flex items-center justify-between group relative transition-all">
                 <div>
                   <div className="flex items-center gap-1.5 mb-1">
                     <p className="text-xs text-red-500 font-bold uppercase tracking-wider italic">Potential Revenue Loss</p>
@@ -119,10 +147,8 @@ export default function Home() {
                     {results?.slowestApps?.[0]?.ms ? calculateRevenueLoss(results.slowestApps[0].ms) : "$0.00"}
                     <span className="text-xs text-slate-400 font-normal ml-1 tracking-normal uppercase italic">/mo</span>
                   </h3>
-                  
-                  {/* Methodology Note */}
                   <p className="mt-2 text-[10px] text-slate-400 leading-tight border-t border-slate-50 pt-2 font-medium">
-                    <span className="text-red-400 font-bold underline">Methodology:</span> 1s lag = 10% sales drop (Source: Akamai/Google)
+                    <span className="text-red-400 font-bold underline italic">Industry Standard Logic:</span> 1s lag = 10% sales drop
                   </p>
                 </div>
                 <div className="bg-red-600 p-3 rounded-full text-white shadow-lg shadow-red-200">
@@ -132,7 +158,7 @@ export default function Home() {
             </div>
 
             {/* Table */}
-            <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden text-slate-900">
+            <div className="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden text-slate-900">
               <div className="px-6 py-5 border-b border-slate-100 bg-slate-50 flex justify-between items-center">
                 <h4 className="font-bold text-slate-800 flex items-center gap-2">
                   <AlertTriangle size={18} className="text-amber-500" />
