@@ -23,7 +23,7 @@ export default function Home() {
   };
 
   return (
-    <main className="min-h-screen bg-[#F8FAFC] text-slate-900 font-sans">
+    <main className="min-h-screen bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-blue-50 via-slate-50 to-white text-slate-900 font-sans">
       {/* Header */}
       <nav className="border-b bg-white px-8 py-4 flex justify-between items-center shadow-sm">
         <div className="flex items-center gap-2 font-bold text-xl text-blue-600">
@@ -38,6 +38,9 @@ export default function Home() {
       <div className="max-w-5xl mx-auto py-12 px-6 space-y-12">
         {/* Search Section */}
         <section className="text-center space-y-6">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-100 border border-blue-200 text-blue-700 text-xs font-bold uppercase tracking-widest animate-pulse">
+              <Activity size={14} /> System Online: Puppeteer Engine Active
+          </div>
           <h2 className="text-4xl font-extrabold text-slate-900 leading-tight">
             Stop losing sales to <span className="text-blue-600">App Bloat</span>
           </h2>
