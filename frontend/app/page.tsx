@@ -8,8 +8,10 @@ export default function Home() {
   const [results, setResults] = useState<any>(null);
 
   const calculateRevenueLoss = (latency: number) => {
-    // 1 second (1000ms) of lag = 10% conversion drop
+    // methodology: 1 second (1000ms) of lag = 10% conversion drop/10% revenue loss
     const impactPercentage = (latency / 1000) * 0.10;
+    
+    // monthly baseline revenue for a mid-market Shopify store
     const monthlyBaseline = 100000; 
     const monthlyLoss = monthlyBaseline * impactPercentage;
     
@@ -62,9 +64,9 @@ export default function Home() {
             </p>
           </div>
 
-          {/* THE BIG HOOK: Industry Benchmarks */}
+          {/*Industry Benchmarks */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-4xl mx-auto">
-            <div className="bg-white/5 border border-white/10 p-4 rounded-2xl backdrop-blur-sm flex items-center gap-4 text-left">
+            <div className="bg-white/5 border border-white/10 p-4 rounded-2xl backdrop-blur-sm flex items-center gap-4 text-left hover:bg-white/10 transition-colors">
               <div className="bg-blue-500/20 p-2 rounded-lg text-blue-400">
                 <BarChart3 size={20} />
               </div>
@@ -73,7 +75,7 @@ export default function Home() {
                 <p className="text-sm font-semibold text-slate-200">1s Delay = 7% Drop in Sales</p>
               </div>
             </div>
-            <div className="bg-white/5 border border-white/10 p-4 rounded-2xl backdrop-blur-sm flex items-center gap-4 text-left">
+            <div className="bg-white/5 border border-white/10 p-4 rounded-2xl backdrop-blur-sm flex items-center gap-4 text-left hover:bg-white/10 transition-colors">
               <div className="bg-red-500/20 p-2 rounded-lg text-red-400">
                 <TrendingDown size={20} />
               </div>
@@ -82,7 +84,7 @@ export default function Home() {
                 <p className="text-sm font-semibold text-slate-200">53% Bounce rate after 3s</p>
               </div>
             </div>
-            <div className="bg-white/5 border border-white/10 p-4 rounded-2xl backdrop-blur-sm flex items-center gap-4 text-left">
+            <div className="bg-white/5 border border-white/10 p-4 rounded-2xl backdrop-blur-sm flex items-center gap-4 text-left hover:bg-white/10 transition-colors">
               <div className="bg-green-500/20 p-2 rounded-lg text-green-400">
                 <MousePointer2 size={20} />
               </div>
@@ -117,38 +119,43 @@ export default function Home() {
         {results && (
           <div className="animate-in fade-in slide-in-from-bottom-4 duration-700 space-y-8">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {/* Total Apps */}
               <div className="bg-white p-6 rounded-3xl shadow-sm border border-slate-100 flex items-center justify-between transition-all">
                 <div>
-                  <p className="text-xs text-slate-500 font-bold uppercase tracking-wider mb-1">Total Third-Party Apps</p>
-                  <h3 className="text-4xl font-black text-slate-900">{results?.summary?.apps || 0}</h3>
+                  <p className="text-xs text-slate-500 font-bold uppercase tracking-wider mb-1 text-left">Total Third-Party Apps</p>
+                  <h3 className="text-4xl font-black text-slate-900 text-left">{results?.summary?.apps || 0}</h3>
                 </div>
                 <div className="bg-amber-50 p-3 rounded-full text-amber-500">
                   <AlertTriangle size={24} />
                 </div>
               </div>
 
+              {/* Slowest App */}
               <div className="bg-white p-6 rounded-3xl shadow-sm border border-slate-100 flex items-center justify-between transition-all">
                 <div>
-                  <p className="text-xs text-slate-500 font-bold uppercase tracking-wider mb-1">Slowest App Latency</p>
-                  <h3 className="text-4xl font-black text-red-600">{results?.slowestApps?.[0]?.ms || 0}ms</h3>
+                  <p className="text-xs text-slate-500 font-bold uppercase tracking-wider mb-1 text-left">Slowest App Latency</p>
+                  <h3 className="text-4xl font-black text-red-600 text-left">{results?.slowestApps?.[0]?.ms || 0}ms</h3>
                 </div>
                 <div className="bg-red-50 p-3 rounded-full text-red-600">
                   <Activity size={24} />
                 </div>
               </div>
 
+              {/* Revenue Loss */}
               <div className="bg-white p-6 rounded-3xl shadow-sm border border-red-100 flex items-center justify-between group relative transition-all">
-                <div>
-                  <div className="flex items-center gap-1.5 mb-1">
+                <div className="text-left">
+                  <div className="flex items-center gap-2 mb-1">
                     <p className="text-xs text-red-500 font-bold uppercase tracking-wider italic">Potential Revenue Loss</p>
-                    <Info size={12} className="text-slate-300 cursor-help" />
+                    <div className="px-1.5 py-0.5 rounded bg-slate-100 text-[9px] text-slate-500 font-black tracking-tighter">
+                      BASELINE: $100K/MO
+                    </div>
                   </div>
                   <h3 className="text-4xl font-black text-slate-900">
                     {results?.slowestApps?.[0]?.ms ? calculateRevenueLoss(results.slowestApps[0].ms) : "$0.00"}
                     <span className="text-xs text-slate-400 font-normal ml-1 tracking-normal uppercase italic">/mo</span>
                   </h3>
                   <p className="mt-2 text-[10px] text-slate-400 leading-tight border-t border-slate-50 pt-2 font-medium">
-                    <span className="text-red-400 font-bold underline italic">Industry Standard Logic:</span> 1s lag = 10% sales drop
+                    <span className="text-red-400 font-bold underline italic">Formula:</span> (Latency / 1000ms) * 10% of Monthly Sales
                   </p>
                 </div>
                 <div className="bg-red-600 p-3 rounded-full text-white shadow-lg shadow-red-200">
