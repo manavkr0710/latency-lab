@@ -6,14 +6,14 @@ export default function Home() {
   const [url, setUrl] = useState('');
   const [loading, setLoading] = useState(false);
   const [results, setResults] = useState<any>(null);
+  // added state for the interactive slider
+  const [monthlyRevenue, setMonthlyRevenue] = useState(100000);
 
   const calculateRevenueLoss = (latency: number) => {
     // methodology: 1 second (1000ms) of lag = 10% conversion drop/10% revenue loss
     const impactPercentage = (latency / 1000) * 0.10;
     
-    // monthly baseline revenue for a mid-market Shopify store
-    const monthlyBaseline = 100000; 
-    const monthlyLoss = monthlyBaseline * impactPercentage;
+    const monthlyLoss = monthlyRevenue * impactPercentage;
     
     return monthlyLoss.toLocaleString('en-US', { 
       style: 'currency', 
@@ -64,7 +64,7 @@ export default function Home() {
             </p>
           </div>
 
-          {/*Industry Benchmarks */}
+          {/* Industry Benchmarks */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-4xl mx-auto">
             <div className="bg-white/5 border border-white/10 p-4 rounded-2xl backdrop-blur-sm flex items-center gap-4 text-left hover:bg-white/10 transition-colors">
               <div className="bg-blue-500/20 p-2 rounded-lg text-blue-400">
@@ -118,6 +118,37 @@ export default function Home() {
         {/* Results Section */}
         {results && (
           <div className="animate-in fade-in slide-in-from-bottom-4 duration-700 space-y-8">
+            
+            {/* Interactive Revenue Slider */}
+            <div className="bg-white/5 border border-white/10 p-6 rounded-3xl backdrop-blur-md space-y-6">
+              <div className="flex justify-between items-end">
+                <div className="space-y-1">
+                  <h4 className="text-sm font-bold uppercase tracking-widest text-blue-400">Simulation Settings</h4>
+                  <p className="text-slate-400 text-xs italic">Adjust your monthly revenue to calibrate the potential loss.</p>
+                </div>
+                <div className="text-right">
+                  <span className="text-3xl font-black text-white">${(monthlyRevenue).toLocaleString()}</span>
+                  <p className="text-slate-500 text-[10px] font-bold uppercase tracking-widest">Monthly Revenue Baseline</p>
+                </div>
+              </div>
+              <input
+                type="range"
+                min="10000"
+                max="1000000"
+                step="10000"
+                value={monthlyRevenue}
+                onChange={(e) => setMonthlyRevenue(parseInt(e.target.value))}
+                className="w-full h-2 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-blue-500"
+              />
+              <div className="flex justify-between text-[10px] font-bold text-slate-600 uppercase tracking-tighter">
+                <span>$10k/mo</span>
+                <span>$250k</span>
+                <span>$500k</span>
+                <span>$750k</span>
+                <span>$1M/mo</span>
+              </div>
+            </div>
+
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {/* Total Apps */}
               <div className="bg-white p-6 rounded-3xl shadow-sm border border-slate-100 flex items-center justify-between transition-all">
@@ -147,7 +178,7 @@ export default function Home() {
                   <div className="flex items-center gap-2 mb-1">
                     <p className="text-xs text-red-500 font-bold uppercase tracking-wider italic">Potential Revenue Loss</p>
                     <div className="px-1.5 py-0.5 rounded bg-slate-100 text-[9px] text-slate-500 font-black tracking-tighter">
-                      BASELINE: $100K/MO
+                      BASELINE: ${(monthlyRevenue / 1000)}K/MO
                     </div>
                   </div>
                   <h3 className="text-4xl font-black text-slate-900">
@@ -155,7 +186,7 @@ export default function Home() {
                     <span className="text-xs text-slate-400 font-normal ml-1 tracking-normal uppercase italic">/mo</span>
                   </h3>
                   <p className="mt-2 text-[10px] text-slate-400 leading-tight border-t border-slate-50 pt-2 font-medium">
-                    <span className="text-red-400 font-bold underline italic">Formula:</span> (Latency / 1000ms) * 10% of Monthly Sales
+                    <span className="text-red-400 font-bold underline italic">Formula:</span> (Latency / 1000ms) * 10% of ${(monthlyRevenue / 1000)}k
                   </p>
                 </div>
                 <div className="bg-red-600 p-3 rounded-full text-white shadow-lg shadow-red-200">
