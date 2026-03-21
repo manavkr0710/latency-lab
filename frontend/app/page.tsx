@@ -1,6 +1,6 @@
 "use client";
 import { useState } from 'react';
-import { Search, Zap, AlertTriangle, Globe, Activity } from 'lucide-react';
+import { Search, Zap, AlertTriangle, Globe, Activity, Info } from 'lucide-react';
 
 export default function Home() {
   const [url, setUrl] = useState('');
@@ -8,9 +8,13 @@ export default function Home() {
   const [results, setResults] = useState<any>(null);
 
   const calculateRevenueLoss = (latency: number) => {
-    // 100ms lag = 1% conversion drop. Base: $100k/mo revenue
-    const impactPercentage = (latency / 100) * 0.01;
-    const monthlyLoss = 100000 * impactPercentage;
+    // Industry Benchmark: 1 second (1000ms) of lag = 10% conversion drop
+    const impactPercentage = (latency / 1000) * 0.10;
+    
+    // Monthly baseline revenue for a mid-market Shopify store
+    const monthlyBaseline = 100000; 
+    const monthlyLoss = monthlyBaseline * impactPercentage;
+    
     return monthlyLoss.toLocaleString('en-US', { 
       style: 'currency', 
       currency: 'USD',
@@ -83,7 +87,7 @@ export default function Home() {
           <div className="animate-in fade-in slide-in-from-bottom-4 duration-700 space-y-8">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {/* Total Apps */}
-              <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex items-center justify-between group hover:border-blue-200 transition-all">
+              <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex items-center justify-between transition-all">
                 <div>
                   <p className="text-xs text-slate-500 font-bold uppercase tracking-wider mb-1">Total Third-Party Apps</p>
                   <h3 className="text-4xl font-black text-slate-900">{results?.summary?.apps || 0}</h3>
@@ -94,7 +98,7 @@ export default function Home() {
               </div>
 
               {/* Slowest App */}
-              <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex items-center justify-between group hover:border-red-200 transition-all">
+              <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex items-center justify-between transition-all">
                 <div>
                   <p className="text-xs text-slate-500 font-bold uppercase tracking-wider mb-1">Slowest App Latency</p>
                   <h3 className="text-4xl font-black text-red-600">{results?.slowestApps?.[0]?.ms || 0}ms</h3>
@@ -105,13 +109,21 @@ export default function Home() {
               </div>
 
               {/* Revenue Loss */}
-              <div className="bg-white p-6 rounded-2xl shadow-sm border border-red-100 flex items-center justify-between group hover:shadow-lg transition-all">
+              <div className="bg-white p-6 rounded-2xl shadow-sm border border-red-100 flex items-center justify-between group relative transition-all">
                 <div>
-                  <p className="text-xs text-red-500 font-bold uppercase tracking-wider mb-1 italic">Potential Revenue Loss</p>
+                  <div className="flex items-center gap-1.5 mb-1">
+                    <p className="text-xs text-red-500 font-bold uppercase tracking-wider italic">Potential Revenue Loss</p>
+                    <Info size={12} className="text-slate-300 cursor-help" />
+                  </div>
                   <h3 className="text-4xl font-black text-slate-900">
                     {results?.slowestApps?.[0]?.ms ? calculateRevenueLoss(results.slowestApps[0].ms) : "$0.00"}
                     <span className="text-xs text-slate-400 font-normal ml-1 tracking-normal uppercase italic">/mo</span>
                   </h3>
+                  
+                  {/* Methodology Note */}
+                  <p className="mt-2 text-[10px] text-slate-400 leading-tight border-t border-slate-50 pt-2 font-medium">
+                    <span className="text-red-400 font-bold underline">Methodology:</span> 1s lag = 10% sales drop (Source: Akamai/Google)
+                  </p>
                 </div>
                 <div className="bg-red-600 p-3 rounded-full text-white shadow-lg shadow-red-200">
                   <Zap size={24} fill="currentColor" />
@@ -120,7 +132,7 @@ export default function Home() {
             </div>
 
             {/* Table */}
-            <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+            <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden text-slate-900">
               <div className="px-6 py-5 border-b border-slate-100 bg-slate-50 flex justify-between items-center">
                 <h4 className="font-bold text-slate-800 flex items-center gap-2">
                   <AlertTriangle size={18} className="text-amber-500" />
