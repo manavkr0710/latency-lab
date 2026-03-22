@@ -14,6 +14,7 @@ const puppeteer = require('puppeteer');
 // define the root route to test if the server is awake
 fastify.get('/audit', async (request, reply) => {
   let targetUrl = request.query.url;
+  const deviceType = request.query.device || 'desktop';
 
   if (!targetUrl || targetUrl.trim() === "") {
     return reply.status(400).send({
@@ -32,6 +33,20 @@ fastify.get('/audit', async (request, reply) => {
     browser = await puppeteer.launch({ headless: "new" });
     const page = await browser.newPage();
 
+    if (deviceType === 'mobile') {
+    // emulate iPhone 13-style screen and user agent
+    await page.setUserAgent('Mozilla/5.0 (iPhone; CPU iPhone OS 15_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.0 Mobile/15E148 Safari/604.1');
+    await page.setViewport({ width: 390, height: 844, isMobile: true, hasTouch: true });
+    
+    // simulate 4G network throttling
+    const client = await page.target().createCDPSession();
+    await client.send('Network.emulateNetworkConditions', {
+      offline: false,
+      latency: 150, // 150ms 4G latency
+      downloadThroughput: 1.6 * 1024 * 1024 / 8, // 1.6Mbps
+      uploadThroughput: 750 * 1024 / 8,
+    });
+  }
     const report = { firstParty: 0, thirdParty: [] };
     const firstPartyDomains = ['shopify.com', 'shopifycdn.com', 'myshopify.com'];
 
