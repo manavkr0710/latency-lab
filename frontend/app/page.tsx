@@ -12,13 +12,13 @@ export default function Home() {
   const calculateRevenueLoss = (latency: number) => {
     // methodology: 1 second (1000ms) of lag = 10% conversion drop/10% revenue loss
     const impactPercentage = (latency / 1000) * 0.10;
-    
+
     const monthlyLoss = monthlyRevenue * impactPercentage;
-    
-    return monthlyLoss.toLocaleString('en-US', { 
-      style: 'currency', 
+
+    return monthlyLoss.toLocaleString('en-US', {
+      style: 'currency',
       currency: 'USD',
-      maximumFractionDigits: 0 
+      maximumFractionDigits: 0
     });
   };
 
@@ -36,6 +36,20 @@ export default function Home() {
     }
   };
 
+  const ADVICE_DB: Record<string, { label: string; tip: string; color: string }> = {
+    'connect.facebook.net': { label: 'Tracking Pixel', tip: 'Move to Server-Side GTM to save 200ms+ of browser load.', color: 'bg-blue-500' },
+    'google-analytics.com': { label: 'Analytics', tip: 'Ensure you are using the latest gtag.js with the "defer" attribute.', color: 'bg-green-500' },
+    'googletagmanager.com': { label: 'Tag Manager', tip: 'Audit your tags; every script inside GTM adds to this latency.', color: 'bg-emerald-500' },
+    'static.hotjar.com': { label: 'Heatmap', tip: 'Set to trigger only after 5 seconds of user activity (Lazy Load).', color: 'bg-orange-500' },
+    'tiktok.com': { label: 'Social Pixel', tip: 'Significant TTFB impact. Consider using a Shopify Pixel Sandbox.', color: 'bg-black' },
+    'shopify.com': { label: 'Core Shopify', tip: 'Internal script. Usually optimized, but check for theme conflicts.', color: 'bg-purple-500' },
+    'klaviyo.com': { label: 'Marketing', tip: 'Delay initialization until the first mouse movement.', color: 'bg-blue-400' },
+  };
+
+  const getAdvice = (hostname: string) => {
+    const match = Object.keys(ADVICE_DB).find(key => hostname.includes(key));
+    return ADVICE_DB[match || ''] || { label: 'Third-Party', tip: 'General script: Consider deferring or using a Web Worker.', color: 'bg-slate-400' };
+  };
   return (
     <main className="min-h-screen bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-slate-900 via-slate-950 to-black text-slate-100 font-sans">
       {/* Header */}
@@ -54,7 +68,7 @@ export default function Home() {
         <section className="text-center space-y-10">
           <div className="space-y-6">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-xs font-bold uppercase tracking-widest animate-pulse">
-                <Activity size={14} /> System Online: Puppeteer Engine Active
+              <Activity size={14} /> System Online: Puppeteer Engine Active
             </div>
             <h2 className="text-6xl font-black text-white leading-tight tracking-tight">
               Stop losing sales to <span className="text-blue-500">App Bloat</span>
@@ -94,7 +108,7 @@ export default function Home() {
               </div>
             </div>
           </div>
-          
+
           <div className="max-w-2xl mx-auto relative flex items-center group pt-4">
             <Globe className="absolute left-4 text-slate-500 group-focus-within:text-blue-500 transition-colors" size={20} />
             <input
@@ -104,7 +118,7 @@ export default function Home() {
               value={url}
               onChange={(e) => setUrl(e.target.value)}
             />
-            <button 
+            <button
               onClick={startAudit}
               disabled={loading}
               className="absolute right-2 bg-blue-600 text-white px-8 py-2.5 rounded-xl font-bold hover:bg-blue-700 transition-all flex items-center gap-2 disabled:bg-slate-700 disabled:text-slate-400 shadow-lg"
@@ -118,7 +132,7 @@ export default function Home() {
         {/* Results Section */}
         {results && (
           <div className="animate-in fade-in slide-in-from-bottom-4 duration-700 space-y-8">
-            
+
             {/* Interactive Revenue Slider */}
             <div className="bg-white/5 border border-white/10 p-6 rounded-3xl backdrop-blur-md space-y-6">
               <div className="flex justify-between items-end">
@@ -208,20 +222,36 @@ export default function Home() {
                 <thead>
                   <tr className="text-xs uppercase text-slate-400 font-bold border-b border-slate-100">
                     <th className="px-6 py-4">App Hostname</th>
+                    <th className="px-6 py-4">Type & Recommendation</th>
                     <th className="px-6 py-4 text-right">Network Impact</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-50">
-                  {results.slowestApps.map((app: any, i: number) => (
-                    <tr key={i} className="hover:bg-slate-50 transition-colors group">
-                      <td className="px-6 py-4 font-semibold text-slate-700 tracking-tight">{app.hostname}</td>
-                      <td className="px-6 py-4 text-right">
-                        <span className={`px-4 py-1 rounded-full text-sm font-bold ${app.ms > 200 ? 'bg-red-100 text-red-700' : 'bg-amber-100 text-amber-700'}`}>
-                          {app.ms} ms
-                        </span>
-                      </td>
-                    </tr>
-                  ))}
+                  {results.slowestApps.map((app: any, i: number) => {
+                    const advice = getAdvice(app.hostname);
+                    return (
+                      <tr key={i} className="hover:bg-slate-50 transition-colors group">
+                        <td className="px-6 py-4 font-semibold text-slate-700 tracking-tight">
+                          {app.hostname}
+                        </td>
+                        <td className="px-6 py-4">
+                          <div className="flex flex-col gap-1">
+                            <span className={`w-fit px-2 py-0.5 rounded text-[10px] font-bold text-white uppercase ${advice.color}`}>
+                              {advice.label}
+                            </span>
+                            <p className="text-[11px] text-slate-500 leading-tight max-w-[250px]">
+                              {advice.tip}
+                            </p>
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 text-right">
+                          <span className={`px-4 py-1 rounded-full text-sm font-bold ${app.ms > 200 ? 'bg-red-100 text-red-700' : 'bg-amber-100 text-amber-700'}`}>
+                            {app.ms} ms
+                          </span>
+                        </td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
             </div>
