@@ -19,3 +19,8 @@ Thumbs.db
 
 # Test coverage results
 coverage/
+
+# AI Configuration / Agent Rules
+agents.md
+claude.md
+.cursorrules
