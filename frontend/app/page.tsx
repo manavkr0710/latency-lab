@@ -2,20 +2,32 @@
 import { useState } from 'react';
 import { Search, Zap, AlertTriangle, Globe, Activity, Info, BarChart3, TrendingDown, MousePointer2 } from 'lucide-react';
 
+// Advice database for recommendations
+const ADVICE_DB: Record<string, { label: string; tip: string; color: string }> = {
+  'connect.facebook.net': { label: 'Tracking Pixel', tip: 'Move to Server-Side GTM to save 200ms+ of browser load.', color: 'bg-blue-500' },
+  'google-analytics.com': { label: 'Analytics', tip: 'Ensure you are using the latest gtag.js with the "defer" attribute.', color: 'bg-green-500' },
+  'googletagmanager.com': { label: 'Tag Manager', tip: 'Audit your tags; every script inside GTM adds to this latency.', color: 'bg-emerald-500' },
+  'static.hotjar.com': { label: 'Heatmap', tip: 'Set to trigger only after 5 seconds of user activity (Lazy Load).', color: 'bg-orange-500' },
+  'tiktok.com': { label: 'Social Pixel', tip: 'Significant TTFB impact. Consider using a Shopify Pixel Sandbox.', color: 'bg-black' },
+  'shopify.com': { label: 'Core Shopify', tip: 'Internal script. Usually optimized, but check for theme conflicts.', color: 'bg-purple-500' },
+  'klaviyo.com': { label: 'Marketing', tip: 'Delay initialization until the first mouse movement.', color: 'bg-blue-400' },
+};
+
+const getAdvice = (hostname: string) => {
+  const match = Object.keys(ADVICE_DB).find(key => hostname.includes(key));
+  return ADVICE_DB[match || ''] || { label: 'Third-Party', tip: 'General script: Consider deferring or using a Web Worker.', color: 'bg-slate-400' };
+};
+
 export default function Home() {
   const [error, setError] = useState<string | null>(null);
   const [url, setUrl] = useState('');
   const [loading, setLoading] = useState(false);
   const [results, setResults] = useState<any>(null);
-  // added state for the interactive slider
   const [monthlyRevenue, setMonthlyRevenue] = useState(100000);
 
   const calculateRevenueLoss = (latency: number) => {
-    // methodology: 1 second (1000ms) of lag = 10% conversion drop/10% revenue loss
     const impactPercentage = (latency / 1000) * 0.10;
-
     const monthlyLoss = monthlyRevenue * impactPercentage;
-
     return monthlyLoss.toLocaleString('en-US', {
       style: 'currency',
       currency: 'USD',
@@ -26,8 +38,8 @@ export default function Home() {
   const startAudit = async () => {
     if (!url) return;
     setLoading(true);
-    setError(null); 
-    setResults(null); 
+    setError(null);
+    setResults(null);
 
     try {
       const response = await fetch(`http://localhost:3001/audit?url=${url}`);
@@ -36,7 +48,6 @@ export default function Home() {
       if (!response.ok) {
         throw new Error(data.message || "Something went wrong");
       }
-
       setResults(data);
     } catch (err: any) {
       setError(err.message);
@@ -46,23 +57,11 @@ export default function Home() {
     }
   };
 
-  const ADVICE_DB: Record<string, { label: string; tip: string; color: string }> = {
-    'connect.facebook.net': { label: 'Tracking Pixel', tip: 'Move to Server-Side GTM to save 200ms+ of browser load.', color: 'bg-blue-500' },
-    'google-analytics.com': { label: 'Analytics', tip: 'Ensure you are using the latest gtag.js with the "defer" attribute.', color: 'bg-green-500' },
-    'googletagmanager.com': { label: 'Tag Manager', tip: 'Audit your tags; every script inside GTM adds to this latency.', color: 'bg-emerald-500' },
-    'static.hotjar.com': { label: 'Heatmap', tip: 'Set to trigger only after 5 seconds of user activity (Lazy Load).', color: 'bg-orange-500' },
-    'tiktok.com': { label: 'Social Pixel', tip: 'Significant TTFB impact. Consider using a Shopify Pixel Sandbox.', color: 'bg-black' },
-    'shopify.com': { label: 'Core Shopify', tip: 'Internal script. Usually optimized, but check for theme conflicts.', color: 'bg-purple-500' },
-    'klaviyo.com': { label: 'Marketing', tip: 'Delay initialization until the first mouse movement.', color: 'bg-blue-400' },
-  };
+  // calculate cumulative latency for the new Bloat metric
+  const totalBloat = results?.slowestApps?.reduce((acc: number, app: any) => acc + app.ms, 0) || 0;
 
-  const getAdvice = (hostname: string) => {
-    const match = Object.keys(ADVICE_DB).find(key => hostname.includes(key));
-    return ADVICE_DB[match || ''] || { label: 'Third-Party', tip: 'General script: Consider deferring or using a Web Worker.', color: 'bg-slate-400' };
-  };
   return (
     <main className="min-h-screen bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-slate-900 via-slate-950 to-black text-slate-100 font-sans">
-      {/* Header */}
       <nav className="border-b border-white/10 bg-black/50 backdrop-blur-md px-8 py-4 flex justify-between items-center shadow-sm sticky top-0 z-50">
         <div className="flex items-center gap-2 font-bold text-xl text-blue-500">
           <Zap size={24} fill="currentColor" />
@@ -74,7 +73,6 @@ export default function Home() {
       </nav>
 
       <div className="max-w-6xl mx-auto py-12 px-6 space-y-12">
-        {/* Search & Hook Section */}
         <section className="text-center space-y-10">
           <div className="space-y-6">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-xs font-bold uppercase tracking-widest animate-pulse">
@@ -88,30 +86,23 @@ export default function Home() {
             </p>
           </div>
 
-          {/* Industry Benchmarks */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-4xl mx-auto">
             <div className="bg-white/5 border border-white/10 p-4 rounded-2xl backdrop-blur-sm flex items-center gap-4 text-left hover:bg-white/10 transition-colors">
-              <div className="bg-blue-500/20 p-2 rounded-lg text-blue-400">
-                <BarChart3 size={20} />
-              </div>
+              <div className="bg-blue-500/20 p-2 rounded-lg text-blue-400"><BarChart3 size={20} /></div>
               <div>
                 <p className="text-[10px] uppercase tracking-widest text-slate-500 font-bold">Akamai Data</p>
                 <p className="text-sm font-semibold text-slate-200">1s Delay = 7% Drop in Sales</p>
               </div>
             </div>
             <div className="bg-white/5 border border-white/10 p-4 rounded-2xl backdrop-blur-sm flex items-center gap-4 text-left hover:bg-white/10 transition-colors">
-              <div className="bg-red-500/20 p-2 rounded-lg text-red-400">
-                <TrendingDown size={20} />
-              </div>
+              <div className="bg-red-500/20 p-2 rounded-lg text-red-400"><TrendingDown size={20} /></div>
               <div>
                 <p className="text-[10px] uppercase tracking-widest text-slate-500 font-bold">Google Study</p>
                 <p className="text-sm font-semibold text-slate-200">53% Bounce rate after 3s</p>
               </div>
             </div>
             <div className="bg-white/5 border border-white/10 p-4 rounded-2xl backdrop-blur-sm flex items-center gap-4 text-left hover:bg-white/10 transition-colors">
-              <div className="bg-green-500/20 p-2 rounded-lg text-green-400">
-                <MousePointer2 size={20} />
-              </div>
+              <div className="bg-green-500/20 p-2 rounded-lg text-green-400"><MousePointer2 size={20} /></div>
               <div>
                 <p className="text-[10px] uppercase tracking-widest text-slate-500 font-bold">Amazon Metric</p>
                 <p className="text-sm font-semibold text-slate-200">100ms lag = 1% Revenue Loss</p>
@@ -138,17 +129,16 @@ export default function Home() {
             </button>
           </div>
         </section>
+
         {error && (
           <div className="max-w-2xl mx-auto bg-red-500/10 border border-red-500/20 p-4 rounded-2xl flex items-center gap-3 text-red-400 animate-in fade-in zoom-in duration-300">
             <AlertTriangle size={20} />
             <p className="text-sm font-medium">{error}</p>
           </div>
         )}
-        {/* Results Section */}
+
         {results && (
           <div className="animate-in fade-in slide-in-from-bottom-4 duration-700 space-y-8">
-
-            {/* Interactive Revenue Slider */}
             <div className="bg-white/5 border border-white/10 p-6 rounded-3xl backdrop-blur-md space-y-6">
               <div className="flex justify-between items-end">
                 <div className="space-y-1">
@@ -169,57 +159,52 @@ export default function Home() {
                 onChange={(e) => setMonthlyRevenue(parseInt(e.target.value))}
                 className="w-full h-2 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-blue-500"
               />
-              <div className="flex justify-between text-[10px] font-bold text-slate-600 uppercase tracking-tighter">
-                <span>$10k/mo</span>
-                <span>$250k</span>
-                <span>$500k</span>
-                <span>$750k</span>
-                <span>$1M/mo</span>
-              </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {/* Total Apps */}
-              <div className="bg-white p-6 rounded-3xl shadow-sm border border-slate-100 flex items-center justify-between transition-all">
-                <div>
-                  <p className="text-xs text-slate-500 font-bold uppercase tracking-wider mb-1 text-left">Total Third-Party Apps</p>
-                  <h3 className="text-4xl font-black text-slate-900 text-left">{results?.summary?.apps || 0}</h3>
+              {/* Card 1: Slowest Individual App (Now on the Left) */}
+              <div className="bg-white p-6 rounded-3xl shadow-sm border border-slate-100 flex items-center justify-between group hover:border-red-200 transition-all">
+                <div className="text-left">
+                  <p className="text-xs text-slate-500 font-bold uppercase tracking-wider mb-1">Slowest Individual App</p>
+                  <h3 className="text-4xl font-black text-red-600">{results?.slowestApps?.[0]?.ms || 0}ms</h3>
+                  <p className="text-[10px] text-slate-400 mt-1 font-medium italic">Single biggest performance bottleneck</p>
                 </div>
-                <div className="bg-amber-50 p-3 rounded-full text-amber-500">
-                  <AlertTriangle size={24} />
+                <div className="bg-red-50 p-3 rounded-full text-red-600">
+                  <Zap size={24} />
                 </div>
               </div>
 
-              {/* Slowest App */}
-              <div className="bg-white p-6 rounded-3xl shadow-sm border border-slate-100 flex items-center justify-between transition-all">
-                <div>
-                  <p className="text-xs text-slate-500 font-bold uppercase tracking-wider mb-1 text-left">Slowest App Latency</p>
-                  <h3 className="text-4xl font-black text-red-600 text-left">{results?.slowestApps?.[0]?.ms || 0}ms</h3>
+              {/* Card 2: Total Script Bloat (Now in the Middle) */}
+              <div className="bg-white p-6 rounded-3xl shadow-sm border border-slate-100 flex items-center justify-between group hover:border-blue-200 transition-all">
+                <div className="text-left">
+                  <p className="text-xs text-slate-500 font-bold uppercase tracking-wider mb-1">Total Script Bloat</p>
+                  <h3 className="text-4xl font-black text-blue-600">{(totalBloat / 1000).toFixed(2)}s</h3>
+                  <p className="text-[10px] text-slate-400 mt-1 font-medium italic">Combined delay from {results?.summary?.apps} apps</p>
                 </div>
-                <div className="bg-red-50 p-3 rounded-full text-red-600">
+                <div className="bg-blue-50 p-3 rounded-full text-blue-600">
                   <Activity size={24} />
                 </div>
               </div>
 
-              {/* Revenue Loss */}
+              {/* Card 3: Revenue Loss (Remains on the Right as the Final Consequence) */}
               <div className="bg-white p-6 rounded-3xl shadow-sm border border-red-100 flex items-center justify-between group relative transition-all">
                 <div className="text-left">
                   <div className="flex items-center gap-2 mb-1">
                     <p className="text-xs text-red-500 font-bold uppercase tracking-wider italic">Potential Revenue Loss</p>
-                    <div className="px-1.5 py-0.5 rounded bg-slate-100 text-[9px] text-slate-500 font-black tracking-tighter">
+                    <div className="px-1.5 py-0.5 rounded bg-slate-100 text-[9px] text-slate-500 font-black tracking-tighter uppercase">
                       BASELINE: ${(monthlyRevenue / 1000)}K/MO
                     </div>
                   </div>
                   <h3 className="text-4xl font-black text-slate-900">
-                    {results?.slowestApps?.[0]?.ms ? calculateRevenueLoss(results.slowestApps[0].ms) : "$0.00"}
+                    {calculateRevenueLoss(totalBloat)}
                     <span className="text-xs text-slate-400 font-normal ml-1 tracking-normal uppercase italic">/mo</span>
                   </h3>
                   <p className="mt-2 text-[10px] text-slate-400 leading-tight border-t border-slate-50 pt-2 font-medium">
-                    <span className="text-red-400 font-bold underline italic">Formula:</span> (Latency / 1000ms) * 10% of ${(monthlyRevenue / 1000)}k
+                    <span className="text-red-400 font-bold underline italic">Cumulative Impact:</span> Every 1s of total bloat = 10% sales drop.
                   </p>
                 </div>
                 <div className="bg-red-600 p-3 rounded-full text-white shadow-lg shadow-red-200">
-                  <Zap size={24} fill="currentColor" />
+                  <TrendingDown size={24} />
                 </div>
               </div>
             </div>
@@ -246,17 +231,11 @@ export default function Home() {
                     const advice = getAdvice(app.hostname);
                     return (
                       <tr key={i} className="hover:bg-slate-50 transition-colors group">
-                        <td className="px-6 py-4 font-semibold text-slate-700 tracking-tight">
-                          {app.hostname}
-                        </td>
+                        <td className="px-6 py-4 font-semibold text-slate-700 tracking-tight">{app.hostname}</td>
                         <td className="px-6 py-4">
-                          <div className="flex flex-col gap-1">
-                            <span className={`w-fit px-2 py-0.5 rounded text-[10px] font-bold text-white uppercase ${advice.color}`}>
-                              {advice.label}
-                            </span>
-                            <p className="text-[11px] text-slate-500 leading-tight max-w-[250px]">
-                              {advice.tip}
-                            </p>
+                          <div className="flex flex-col gap-1 text-left">
+                            <span className={`w-fit px-2 py-0.5 rounded text-[10px] font-bold text-white uppercase ${advice.color}`}>{advice.label}</span>
+                            <p className="text-[11px] text-slate-500 leading-tight max-w-[250px]">{advice.tip}</p>
                           </div>
                         </td>
                         <td className="px-6 py-4 text-right">
