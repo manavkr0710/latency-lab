@@ -87,29 +87,34 @@ export default function Home() {
           </div>
 
           {/*Industry Benchmarks */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-3 max-w-4xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3 max-5-4xl mx-auto">
             <div className="bg-white/5 border border-white/10 p-4 rounded-2xl backdrop-blur-sm flex items-center gap-4 text-left hover:bg-white/10 transition-colors">
               <div className="bg-blue-500/20 p-2 rounded-lg text-blue-400"><BarChart3 size={20} /></div>
               <div>
                 <p className="text-[10px] uppercase tracking-widest text-slate-500 font-bold">Akamai Data</p>
-                <p className="text-sm font-semibold text-slate-200">1s Delay = 7% Drop in Sales</p>
+                <p className="text-sm font-semibold text-slate-200">Est. 7% Revenue Impact per 1s delay*</p>
               </div>
             </div>
             <div className="bg-white/5 border border-white/10 p-4 rounded-2xl backdrop-blur-sm flex items-center gap-4 text-left hover:bg-white/10 transition-colors">
               <div className="bg-red-500/20 p-2 rounded-lg text-red-400"><TrendingDown size={20} /></div>
               <div>
                 <p className="text-[10px] uppercase tracking-widest text-slate-500 font-bold">Akamai Data</p>
-                <p className="text-sm font-semibold text-slate-200">103% Bounce rate after 2s</p>
+                <p className="text-sm font-semibold text-slate-200">Avg. 103% Bounce rate after 2s*</p>
               </div>
             </div>
             <div className="bg-white/5 border border-white/10 p-4 rounded-2xl backdrop-blur-sm flex items-center gap-4 text-left hover:bg-white/10 transition-colors">
               <div className="bg-green-500/20 p-2 rounded-lg text-green-400"><MousePointer2 size={20} /></div>
               <div>
                 <p className="text-[10px] uppercase tracking-widest text-slate-500 font-bold">Amazon Metric</p>
-                <p className="text-sm font-semibold text-slate-200">100ms lag = ~1% Revenue Loss</p>
+                <p className="text-sm font-semibold text-slate-200">~1% Revenue Correlation per 100ms lag*</p>
               </div>
             </div>
           </div>
+          <p className="text-[10px] text-slate-500 max-w-2xl mx-auto mt-4 italic leading-relaxed">
+            * Metrics based on historical industry studies (Akamai, Google, Amazon). Actual conversion impact
+            varies by industry, average order value (AOV), and customer intent. These figures are
+            simulated estimates intended for performance benchmarking.
+          </p>
 
           <div className="max-w-2xl mx-auto space-y-6">
             {/* Device Selection Toggle */}
