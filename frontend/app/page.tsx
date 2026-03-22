@@ -1,6 +1,6 @@
 "use client";
 import { useState } from 'react';
-import { Search, Zap, AlertTriangle, Globe, Activity, Info, BarChart3, TrendingDown, MousePointer2 } from 'lucide-react';
+import { Search, Zap, AlertTriangle, Globe, Activity, Info, BarChart3, TrendingDown, MousePointer2, Monitor, TabletSmartphone } from 'lucide-react';
 
 // Advice database for recommendations
 const ADVICE_DB: Record<string, { label: string; tip: string; color: string }> = {
@@ -24,6 +24,7 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
   const [results, setResults] = useState<any>(null);
   const [monthlyRevenue, setMonthlyRevenue] = useState(100000);
+  const [device, setDevice] = useState<'desktop' | 'mobile'>('desktop');
 
   const calculateRevenueLoss = (latency: number) => {
     const impactPercentage = (latency / 1000) * 0.10;
@@ -42,7 +43,7 @@ export default function Home() {
     setResults(null);
 
     try {
-      const response = await fetch(`http://localhost:3001/audit?url=${url}`);
+      const response = await fetch(`http://localhost:3001/audit?url=${url}&device=${device}`);
       const data = await response.json();
 
       if (!response.ok) {
@@ -57,7 +58,6 @@ export default function Home() {
     }
   };
 
-  // calculate cumulative latency for the new Bloat metric
   const totalBloat = results?.slowestApps?.reduce((acc: number, app: any) => acc + app.ms, 0) || 0;
 
   return (
@@ -86,6 +86,7 @@ export default function Home() {
             </p>
           </div>
 
+          {/*Industry Benchmarks */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-4xl mx-auto">
             <div className="bg-white/5 border border-white/10 p-4 rounded-2xl backdrop-blur-sm flex items-center gap-4 text-left hover:bg-white/10 transition-colors">
               <div className="bg-blue-500/20 p-2 rounded-lg text-blue-400"><BarChart3 size={20} /></div>
@@ -110,23 +111,43 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="max-w-2xl mx-auto relative flex items-center group pt-4">
-            <Globe className="absolute left-4 text-slate-500 group-focus-within:text-blue-500 transition-colors" size={20} />
-            <input
-              type="text"
-              placeholder="Enter URL (e.g., gymshark.com)"
-              className="w-full pl-12 pr-32 py-4 rounded-2xl bg-white/5 backdrop-blur-md border border-white/10 text-white placeholder:text-slate-500 focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all text-lg shadow-2xl"
-              value={url}
-              onChange={(e) => setUrl(e.target.value)}
-            />
-            <button
-              onClick={startAudit}
-              disabled={loading}
-              className="absolute right-2 bg-blue-600 text-white px-8 py-2.5 rounded-xl font-bold hover:bg-blue-700 transition-all flex items-center gap-2 disabled:bg-slate-700 disabled:text-slate-400 shadow-lg"
-            >
-              {loading ? <Activity className="animate-spin" size={18} /> : <Search size={18} />}
-              {loading ? 'Analyzing...' : 'Analyze'}
-            </button>
+          <div className="max-w-2xl mx-auto space-y-6">
+            {/* Device Selection Toggle */}
+            <div className="flex justify-center">
+              <div className="bg-white/5 p-1 rounded-2xl border border-white/10 flex gap-1">
+                <button
+                  onClick={() => setDevice('desktop')}
+                  className={`flex items-center gap-2 px-6 py-2.5 rounded-xl font-bold text-xs transition-all ${device === 'desktop' ? 'bg-blue-600 text-white shadow-lg' : 'text-slate-500 hover:text-slate-300'}`}
+                >
+                  <Monitor size={14} /> DESKTOP
+                </button>
+                <button
+                  onClick={() => setDevice('mobile')}
+                  className={`flex items-center gap-2 px-6 py-2.5 rounded-xl font-bold text-xs transition-all ${device === 'mobile' ? 'bg-blue-600 text-white shadow-lg' : 'text-slate-500 hover:text-slate-300'}`}
+                >
+                  <TabletSmartphone size={14} /> MOBILE (4G)
+                </button>
+              </div>
+            </div>
+
+            <div className="relative flex items-center group">
+              <Globe className="absolute left-4 text-slate-500 group-focus-within:text-blue-500 transition-colors" size={20} />
+              <input
+                type="text"
+                placeholder="Enter URL (e.g., gymshark.com)"
+                className="w-full pl-12 pr-32 py-4 rounded-2xl bg-white/5 backdrop-blur-md border border-white/10 text-white placeholder:text-slate-500 focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all text-lg shadow-2xl"
+                value={url}
+                onChange={(e) => setUrl(e.target.value)}
+              />
+              <button
+                onClick={startAudit}
+                disabled={loading}
+                className="absolute right-2 bg-blue-600 text-white px-8 py-2.5 rounded-xl font-bold hover:bg-blue-700 transition-all flex items-center gap-2 disabled:bg-slate-700 disabled:text-slate-400 shadow-lg"
+              >
+                {loading ? <Activity className="animate-spin" size={18} /> : <Search size={18} />}
+                {loading ? 'Analyzing...' : 'Analyze'}
+              </button>
+            </div>
           </div>
         </section>
 
@@ -162,7 +183,7 @@ export default function Home() {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {/* Card 1: Slowest Individual App (Now on the Left) */}
+              {/* Slowest Individual App */}
               <div className="bg-white p-6 rounded-3xl shadow-sm border border-slate-100 flex items-center justify-between group hover:border-red-200 transition-all">
                 <div className="text-left">
                   <p className="text-xs text-slate-500 font-bold uppercase tracking-wider mb-1">Slowest Individual App</p>
@@ -174,7 +195,7 @@ export default function Home() {
                 </div>
               </div>
 
-              {/* Card 2: Total Script Bloat (Now in the Middle) */}
+              {/* Total Script Bloat */}
               <div className="bg-white p-6 rounded-3xl shadow-sm border border-slate-100 flex items-center justify-between group hover:border-blue-200 transition-all">
                 <div className="text-left">
                   <p className="text-xs text-slate-500 font-bold uppercase tracking-wider mb-1">Total Script Bloat</p>
@@ -186,7 +207,7 @@ export default function Home() {
                 </div>
               </div>
 
-              {/* Card 3: Revenue Loss (Remains on the Right as the Final Consequence) */}
+              {/* Revenue Loss */}
               <div className="bg-white p-6 rounded-3xl shadow-sm border border-red-100 flex items-center justify-between group relative transition-all">
                 <div className="text-left">
                   <div className="flex items-center gap-2 mb-1">
@@ -209,7 +230,6 @@ export default function Home() {
               </div>
             </div>
 
-            {/* Table */}
             <div className="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden text-slate-900">
               <div className="px-6 py-5 border-b border-slate-100 bg-slate-50 flex justify-between items-center">
                 <h4 className="font-bold text-slate-800 flex items-center gap-2">
