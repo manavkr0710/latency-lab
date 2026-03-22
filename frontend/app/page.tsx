@@ -1,5 +1,5 @@
 "use client";
-import { useState } from 'react';
+import { useState, useEffect } from 'react'; 
 import { Search, Zap, AlertTriangle, Globe, Activity, Info, BarChart3, TrendingDown, MousePointer2, Monitor, TabletSmartphone } from 'lucide-react';
 
 // Advice database for recommendations
@@ -18,6 +18,7 @@ const getAdvice = (hostname: string) => {
   return ADVICE_DB[match || ''] || { label: 'Third-Party', tip: 'General script: Consider deferring or using a Web Worker.', color: 'bg-slate-400' };
 };
 
+
 export default function Home() {
   const [error, setError] = useState<string | null>(null);
   const [url, setUrl] = useState('');
@@ -25,6 +26,26 @@ export default function Home() {
   const [results, setResults] = useState<any>(null);
   const [monthlyRevenue, setMonthlyRevenue] = useState(100000);
   const [device, setDevice] = useState<'desktop' | 'mobile'>('desktop');
+  
+  //System Status State
+  const [isSystemOnline, setIsSystemOnline] = useState(false);
+
+  // Health Check Logic
+  useEffect(() => {
+    const checkStatus = async () => {
+      try {
+        const res = await fetch('http://localhost:3001/health');
+        if (res.ok) setIsSystemOnline(true);
+        else setIsSystemOnline(false);
+      } catch (err) {
+        setIsSystemOnline(false);
+      }
+    };
+    
+    checkStatus();
+    const interval = setInterval(checkStatus, 30000);
+    return () => clearInterval(interval);
+  }, []);
 
   const calculateRevenueLoss = (latency: number) => {
     const impactPercentage = (latency / 1000) * 0.10;
@@ -75,8 +96,14 @@ export default function Home() {
       <div className="max-w-6xl mx-auto py-12 px-6 space-y-12">
         <section className="text-center space-y-10">
           <div className="space-y-6">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-xs font-bold uppercase tracking-widest animate-pulse">
-              <Activity size={14} /> System Online: Puppeteer Engine Active
+            {/* Dynamic Status Badge */}
+            <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-full border text-xs font-bold uppercase tracking-widest transition-all duration-500 ${
+              isSystemOnline 
+              ? 'bg-blue-500/10 border-blue-500/20 text-blue-400 animate-pulse' 
+              : 'bg-red-500/10 border-red-500/20 text-red-400'
+            }`}>
+              <Activity size={14} /> 
+              {isSystemOnline ? 'System Online: Puppeteer Engine Active' : 'System Offline: Check Backend Connection'}
             </div>
             <h2 className="text-6xl font-black text-white leading-tight tracking-tight">
               Stop losing sales to <span className="text-blue-500">App Bloat</span>
@@ -86,7 +113,6 @@ export default function Home() {
             </p>
           </div>
 
-          {/* NEW: Industry Benchmarks Header */}
           <div className="space-y-1 pt-4">
             <h3 className="text-xl font-black uppercase tracking-[0.2em] text-blue-500/80">
               Industry Performance Benchmarks
@@ -96,9 +122,6 @@ export default function Home() {
             </p>
           </div>
 
-          
-
-          {/*Industry Benchmarks */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3 max-w-6xl mx-auto px-4">
             <div className="bg-white/5 border border-white/10 p-4 rounded-2xl backdrop-blur-sm flex items-center gap-4 text-left hover:bg-white/10 transition-colors">
               <div className="bg-blue-500/20 p-2 rounded-lg text-blue-400"><BarChart3 size={20} /></div>
@@ -122,6 +145,7 @@ export default function Home() {
               </div>
             </div>
           </div>
+          
           <p className="text-[10px] text-slate-500 max-w-2xl mx-auto mt-4 italic leading-relaxed">
             * Metrics based on historical industry studies (Akamai, Google, Amazon). Actual conversion impact
             varies by industry, average order value (AOV), and customer intent. These figures are
@@ -129,7 +153,6 @@ export default function Home() {
           </p>
 
           <div className="max-w-2xl mx-auto space-y-6">
-            {/* Device Selection Toggle */}
             <div className="flex justify-center">
               <div className="bg-white/5 p-1 rounded-2xl border border-white/10 flex gap-1">
                 <button
@@ -158,7 +181,7 @@ export default function Home() {
               />
               <button
                 onClick={startAudit}
-                disabled={loading}
+                disabled={loading || !isSystemOnline}
                 className="absolute right-2 bg-blue-600 text-white px-8 py-2.5 rounded-xl font-bold hover:bg-blue-700 transition-all flex items-center gap-2 disabled:bg-slate-700 disabled:text-slate-400 shadow-lg"
               >
                 {loading ? <Activity className="animate-spin" size={18} /> : <Search size={18} />}
@@ -200,7 +223,6 @@ export default function Home() {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {/* Slowest Individual App */}
               <div className="bg-white p-6 rounded-3xl shadow-sm border border-slate-100 flex items-center justify-between group hover:border-red-200 transition-all">
                 <div className="text-left">
                   <p className="text-xs text-slate-500 font-bold uppercase tracking-wider mb-1">Slowest Individual App</p>
@@ -212,7 +234,6 @@ export default function Home() {
                 </div>
               </div>
 
-              {/* Total Script Bloat */}
               <div className="bg-white p-6 rounded-3xl shadow-sm border border-slate-100 flex items-center justify-between group hover:border-blue-200 transition-all">
                 <div className="text-left">
                   <p className="text-xs text-slate-500 font-bold uppercase tracking-wider mb-1">Total Script Bloat</p>
@@ -224,7 +245,6 @@ export default function Home() {
                 </div>
               </div>
 
-              {/* Revenue Loss */}
               <div className="bg-white p-6 rounded-3xl shadow-sm border border-red-100 flex items-center justify-between group relative transition-all">
                 <div className="text-left">
                   <div className="flex items-center gap-2 mb-1">
