@@ -6,7 +6,7 @@ scans the amount of 3rd party resource types to figure out how much
 */
 const fastify = require('fastify')({ logger: true });
 
-fastify.register(require('@fastify/cors'), { 
+fastify.register(require('@fastify/cors'), {
   origin: "*" //frontend will talk to this api
 });
 const puppeteer = require('puppeteer');
@@ -16,64 +16,76 @@ fastify.get('/audit', async (request, reply) => {
   let targetUrl = request.query.url;
 
   if (!targetUrl || targetUrl.trim() === "") {
-    return reply.status(400).send({ 
-      success: false, 
-      error: 'Bad Request', 
-      message: 'Please provide a URL. Example: /audit?url=https://gymshark.com' 
+    return reply.status(400).send({
+      success: false,
+      error: 'Bad Request',
+      message: 'Please provide a URL. Example: /audit?url=https://gymshark.com'
     });
   }
   if (!targetUrl.startsWith('http')) {
     targetUrl = `https://${targetUrl}`;
   }
 
-  let browser; 
+  let browser;
 
   try{
     browser = await puppeteer.launch({ headless: "new" });
-  const page = await browser.newPage();
-  
-  const report = { firstParty: 0, thirdParty: [] };
-  const firstPartyDomains = ['shopify.com', 'shopifycdn.com', 'myshopify.com'];
+    const page = await browser.newPage();
 
-  await page.setRequestInterception(true);
-  page.on('request', (req) => req.continue());
+    const report = { firstParty: 0, thirdParty: [] };
+    const firstPartyDomains = ['shopify.com', 'shopifycdn.com', 'myshopify.com'];
 
-  
-  page.on('requestfinished', async (req) => {
-    if (req.resourceType() === 'script') {
-      const res = await req.response();
-      if (res) {
-        const timing = res.timing();
-        const latency = timing ? timing.receiveHeadersEnd : 0;
-        const scriptUrl = req.url();
-        const hostname = new URL(scriptUrl).hostname;
+    await page.setRequestInterception(true);
+    page.on('request', (req) => req.continue());
 
-        if (!firstPartyDomains.some(d => scriptUrl.includes(d)) && !targetUrl.includes(hostname)) {
-          report.thirdParty.push({ hostname, ms: latency });
-        } else {
-          report.firstParty++;
+
+    page.on('requestfinished', async (req) => {
+      if (req.resourceType() === 'script') {
+        const res = await req.response();
+        if (res) {
+          const timing = res.timing();
+          const latency = timing ? timing.receiveHeadersEnd : 0;
+          const scriptUrl = req.url();
+          const hostname = new URL(scriptUrl).hostname;
+
+          if (!firstPartyDomains.some(d => scriptUrl.includes(d)) && !targetUrl.includes(hostname)) {
+            report.thirdParty.push({ hostname, ms: latency });
+          } else {
+            report.firstParty++;
+          }
         }
       }
+    });
+
+    await page.goto(targetUrl, { waitUntil: 'networkidle2' });
+    const isShopify = await page.evaluate(() => {
+      // check for global Shopify object or the Shopify CDN link
+      return !!(window.Shopify || document.querySelector('link[href*="cdn.shopify.com"]'));
+    });
+
+    if (!isShopify) {
+      await browser.close(); //prevents crashing
+      return reply.code(400).send({
+        error: "Platform Mismatch",
+        message: "This auditor is specifically tuned for Shopify. This site uses a different e-commerce stack!"
+      });
     }
-  });
+    await browser.close();
 
-  await page.goto(targetUrl, { waitUntil: 'networkidle2' });
-  await browser.close();
-
-  // return data as JSON for the frontend
-  return {
-    site: targetUrl,
-    summary: { core: report.firstParty, apps: report.thirdParty.length },
-    slowestApps: report.thirdParty.sort((a, b) => b.ms - a.ms).slice(0, 10)
-  };
+    // return data as JSON for the frontend
+    return {
+      site: targetUrl,
+      summary: { core: report.firstParty, apps: report.thirdParty.length },
+      slowestApps: report.thirdParty.sort((a, b) => b.ms - a.ms).slice(0, 10)
+    };
   } catch (error) {
-   
+
     if (browser) await browser.close();
-    
+
     fastify.log.error(error); //error log
-    return reply.code(500).send({ 
-      error: 'Audit failed', 
-      message: error.message 
+    return reply.code(500).send({
+      error: 'Audit failed',
+      message: error.message
     });
   }
 });

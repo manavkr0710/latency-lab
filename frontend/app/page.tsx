@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { Search, Zap, AlertTriangle, Globe, Activity, Info, BarChart3, TrendingDown, MousePointer2 } from 'lucide-react';
 
 export default function Home() {
+  const [error, setError] = useState<string | null>(null);
   const [url, setUrl] = useState('');
   const [loading, setLoading] = useState(false);
   const [results, setResults] = useState<any>(null);
@@ -25,11 +26,20 @@ export default function Home() {
   const startAudit = async () => {
     if (!url) return;
     setLoading(true);
+    setError(null); 
+    setResults(null); 
+
     try {
       const response = await fetch(`http://localhost:3001/audit?url=${url}`);
       const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || "Something went wrong");
+      }
+
       setResults(data);
-    } catch (err) {
+    } catch (err: any) {
+      setError(err.message);
       console.error("Audit failed", err);
     } finally {
       setLoading(false);
@@ -128,7 +138,12 @@ export default function Home() {
             </button>
           </div>
         </section>
-
+        {error && (
+          <div className="max-w-2xl mx-auto bg-red-500/10 border border-red-500/20 p-4 rounded-2xl flex items-center gap-3 text-red-400 animate-in fade-in zoom-in duration-300">
+            <AlertTriangle size={20} />
+            <p className="text-sm font-medium">{error}</p>
+          </div>
+        )}
         {/* Results Section */}
         {results && (
           <div className="animate-in fade-in slide-in-from-bottom-4 duration-700 space-y-8">
