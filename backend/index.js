@@ -6,6 +6,14 @@ scans the amount of 3rd party resource types to figure out how much
 */
 const fastify = require('fastify')({ logger: true });
 
+fastify.get('/health', async (request, reply) => {
+  return { 
+    status: 'ok', 
+    engine: 'puppeteer',
+    timestamp: new Date().toISOString() 
+  };
+});
+
 fastify.register(require('@fastify/cors'), {
   origin: "*" //frontend will talk to this api
 });
