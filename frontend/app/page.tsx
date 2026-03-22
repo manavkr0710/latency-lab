@@ -27,7 +27,7 @@ export default function Home() {
   const [device, setDevice] = useState<'desktop' | 'mobile'>('desktop');
 
   const calculateRevenueLoss = (latency: number) => {
-    const impactPercentage = (latency / 1000) * 0.07;
+    const impactPercentage = (latency / 1000) * 0.10;
     const monthlyLoss = monthlyRevenue * impactPercentage;
     return monthlyLoss.toLocaleString('en-US', {
       style: 'currency',
@@ -86,27 +86,39 @@ export default function Home() {
             </p>
           </div>
 
+          {/* NEW: Industry Benchmarks Header */}
+          <div className="space-y-1 pt-4">
+            <h3 className="text-xl font-black uppercase tracking-[0.2em] text-blue-500/80">
+              Industry Performance Benchmarks
+            </h3>
+            <p className="text-sm text-slate-500 font-medium italic">
+              How site speed dictates your growth, retention, and bottom line.
+            </p>
+          </div>
+
+          
+
           {/*Industry Benchmarks */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-3 max-5-4xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3 max-w-6xl mx-auto px-4">
             <div className="bg-white/5 border border-white/10 p-4 rounded-2xl backdrop-blur-sm flex items-center gap-4 text-left hover:bg-white/10 transition-colors">
               <div className="bg-blue-500/20 p-2 rounded-lg text-blue-400"><BarChart3 size={20} /></div>
               <div>
-                <p className="text-[10px] uppercase tracking-widest text-slate-500 font-bold">Akamai Data</p>
-                <p className="text-sm font-semibold text-slate-200">Est. 7% Revenue Impact per 1s delay*</p>
+                <p className="text-[10px] uppercase tracking-widest text-slate-500 font-bold">Google Study</p>
+                <p className="text-base font-semibold text-slate-200">Sub-2s Load = 15% More Google Traffic*</p>
               </div>
             </div>
             <div className="bg-white/5 border border-white/10 p-4 rounded-2xl backdrop-blur-sm flex items-center gap-4 text-left hover:bg-white/10 transition-colors">
               <div className="bg-red-500/20 p-2 rounded-lg text-red-400"><TrendingDown size={20} /></div>
               <div>
                 <p className="text-[10px] uppercase tracking-widest text-slate-500 font-bold">Akamai Data</p>
-                <p className="text-sm font-semibold text-slate-200">Avg. 103% Bounce rate after 2s*</p>
+                <p className="text-base font-semibold text-slate-200">Avg. 103% Bounce rate after 2s of Latency*</p>
               </div>
             </div>
             <div className="bg-white/5 border border-white/10 p-4 rounded-2xl backdrop-blur-sm flex items-center gap-4 text-left hover:bg-white/10 transition-colors">
               <div className="bg-green-500/20 p-2 rounded-lg text-green-400"><MousePointer2 size={20} /></div>
               <div>
                 <p className="text-[10px] uppercase tracking-widest text-slate-500 font-bold">Amazon Metric</p>
-                <p className="text-sm font-semibold text-slate-200">~1% Revenue Correlation per 100ms lag*</p>
+                <p className="text-base font-semibold text-slate-200">Every 100ms of latency = ~1% Revenue Impact*</p>
               </div>
             </div>
           </div>
@@ -226,7 +238,7 @@ export default function Home() {
                     <span className="text-xs text-slate-400 font-normal ml-1 tracking-normal uppercase italic">/mo</span>
                   </h3>
                   <p className="mt-2 text-[10px] text-slate-400 leading-tight border-t border-slate-50 pt-2 font-medium">
-                    <span className="text-red-400 font-bold underline italic">Cumulative Impact:</span> Every 1s of total bloat = 7% sales drop.
+                    <span className="text-red-400 font-bold underline italic">Cumulative Impact:</span> Every 1s of total bloat = ~10% sales drop.
                   </p>
                 </div>
                 <div className="bg-red-600 p-3 rounded-full text-white shadow-lg shadow-red-200">
