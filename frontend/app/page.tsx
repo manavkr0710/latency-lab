@@ -18,6 +18,14 @@ const getAdvice = (hostname: string) => {
   return ADVICE_DB[match || ''] || { label: 'Third-Party', tip: 'General script: Consider deferring or using a Web Worker.', color: 'bg-slate-400' };
 };
 
+//Skeleton Components for loading state
+const SkeletonCard = () => (
+  <div className="bg-white/5 border border-white/10 p-6 rounded-3xl animate-pulse">
+    <div className="h-3 w-24 bg-slate-800 rounded mb-4" />
+    <div className="h-8 w-32 bg-slate-800 rounded mb-4" />
+    <div className="h-2 w-full bg-slate-800 rounded" />
+  </div>
+);
 
 export default function Home() {
   const [error, setError] = useState<string | null>(null);
@@ -26,11 +34,8 @@ export default function Home() {
   const [results, setResults] = useState<any>(null);
   const [monthlyRevenue, setMonthlyRevenue] = useState(100000);
   const [device, setDevice] = useState<'desktop' | 'mobile'>('desktop');
-
-  //System Status State
   const [isSystemOnline, setIsSystemOnline] = useState(false);
 
-  // Health Check Logic
   useEffect(() => {
     const checkStatus = async () => {
       try {
@@ -41,7 +46,6 @@ export default function Home() {
         setIsSystemOnline(false);
       }
     };
-
     checkStatus();
     const interval = setInterval(checkStatus, 30000);
     return () => clearInterval(interval);
@@ -122,86 +126,62 @@ export default function Home() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3 max-w-6xl mx-auto px-4">
-            <div className="bg-white/5 border border-white/10 p-4 rounded-2xl backdrop-blur-sm flex items-center gap-4 text-left hover:bg-white/10 transition-colors">
-              <div className="bg-blue-500/20 p-2 rounded-lg text-blue-400"><BarChart3 size={20} /></div>
-              <div>
-                <p className="text-[10px] uppercase tracking-widest text-slate-500 font-bold">Google Study</p>
-                <p className="text-base font-semibold text-slate-200">Sub-2s Load = 15% More Google Traffic*</p>
+            {[
+              { icon: <BarChart3 size={20} />, label: "Google Study", text: "Sub-2s Load = 15% More Google Traffic*", color: "blue" },
+              { icon: <TrendingDown size={20} />, label: "Akamai Data", text: "Avg. 103% Bounce rate after 2s of Latency*", color: "red" },
+              { icon: <MousePointer2 size={20} />, label: "Amazon Metric", text: "Every 100ms of latency = ~1% Revenue Impact*", color: "green" }
+            ].map((item, idx) => (
+              <div key={idx} className="bg-white/5 border border-white/10 p-4 rounded-2xl backdrop-blur-sm flex items-center gap-4 text-left hover:bg-white/10 transition-colors">
+                <div className={`bg-${item.color}-500/20 p-2 rounded-lg text-${item.color}-400`}>{item.icon}</div>
+                <div>
+                  <p className="text-[10px] uppercase tracking-widest text-slate-500 font-bold">{item.label}</p>
+                  <p className="text-base font-semibold text-slate-200">{item.text}</p>
+                </div>
               </div>
-            </div>
-            <div className="bg-white/5 border border-white/10 p-4 rounded-2xl backdrop-blur-sm flex items-center gap-4 text-left hover:bg-white/10 transition-colors">
-              <div className="bg-red-500/20 p-2 rounded-lg text-red-400"><TrendingDown size={20} /></div>
-              <div>
-                <p className="text-[10px] uppercase tracking-widest text-slate-500 font-bold">Akamai Data</p>
-                <p className="text-base font-semibold text-slate-200">Avg. 103% Bounce rate after 2s of Latency*</p>
-              </div>
-            </div>
-            <div className="bg-white/5 border border-white/10 p-4 rounded-2xl backdrop-blur-sm flex items-center gap-4 text-left hover:bg-white/10 transition-colors">
-              <div className="bg-green-500/20 p-2 rounded-lg text-green-400"><MousePointer2 size={20} /></div>
-              <div>
-                <p className="text-[10px] uppercase tracking-widest text-slate-500 font-bold">Amazon Metric</p>
-                <p className="text-base font-semibold text-slate-200">Every 100ms of latency = ~1% Revenue Impact*</p>
-              </div>
-            </div>
+            ))}
           </div>
 
-          <p className="text-[10px] text-slate-500 max-w-2xl mx-auto mt-4 italic leading-relaxed">
-            * Metrics based on historical industry studies (Akamai, Google, Amazon). Actual conversion impact
-            varies by industry, average order value (AOV), and customer intent. These figures are
-            simulated estimates intended for performance benchmarking.
-          </p>
-
           <div className="max-w-2xl mx-auto space-y-6">
-            <div className="flex justify-center">
+            <div className="flex justify-center items-center gap-2">
               <div className="bg-white/5 p-1 rounded-2xl border border-white/10 flex gap-1">
-                <button
-                  onClick={() => setDevice('desktop')}
-                  className={`flex items-center gap-2 px-6 py-2.5 rounded-xl font-bold text-xs transition-all ${device === 'desktop' ? 'bg-blue-600 text-white shadow-lg' : 'text-slate-500 hover:text-slate-300'}`}
-                >
-                  <Monitor size={14} /> DESKTOP
-                </button>
-                <button
-                  onClick={() => setDevice('mobile')}
-                  className={`flex items-center gap-2 px-6 py-2.5 rounded-xl font-bold text-xs transition-all ${device === 'mobile' ? 'bg-blue-600 text-white shadow-lg' : 'text-slate-500 hover:text-slate-300'}`}
-                >
-                  <TabletSmartphone size={14} /> MOBILE (4G)
-                </button>
+                <button onClick={() => setDevice('desktop')} className={`flex items-center gap-2 px-6 py-2.5 rounded-xl font-bold text-xs transition-all ${device === 'desktop' ? 'bg-blue-600 text-white shadow-lg' : 'text-slate-500 hover:text-slate-300'}`}><Monitor size={14} /> DESKTOP</button>
+                <button onClick={() => setDevice('mobile')} className={`flex items-center gap-2 px-6 py-2.5 rounded-xl font-bold text-xs transition-all ${device === 'mobile' ? 'bg-blue-600 text-white shadow-lg' : 'text-slate-500 hover:text-slate-300'}`}><TabletSmartphone size={14} /> MOBILE (4G)</button>
               </div>
-
-              <div className="group relative ml-2">
+              <div className="group relative">
                 <Info size={16} className="text-slate-500 cursor-help hover:text-blue-400 transition-colors" />
                 <div className="absolute left-1/2 -translate-x-1/2 bottom-full mb-3 w-64 p-3 bg-slate-900 border border-white/10 rounded-xl shadow-2xl opacity-0 group-hover:opacity-100 pointer-events-none transition-all z-50 text-left">
-                  <p className="text-[11px] leading-relaxed text-slate-300">
-                    <span className="text-blue-400 font-bold block mb-1 uppercase tracking-tighter">Under the Hood:</span>
-                    Mobile mode simulates a <span className="text-white font-bold">4x slower CPU</span> and <span className="text-white font-bold">4G network latency</span> to reveal how apps perform on real-world customer devices.
-                  </p>
-                  <div className="absolute top-full left-1/2 -translate-x-1/2 border-8 border-transparent border-t-slate-900"></div>
+                  <p className="text-[11px] leading-relaxed text-slate-300"><span className="text-blue-400 font-bold block mb-1 uppercase tracking-tighter">Under the Hood:</span>Mobile mode simulates a <span className="text-white font-bold">4x slower CPU</span> and <span className="text-white font-bold">4G network latency</span> to reveal real-world performance.</p>
+                  <div className="absolute top-full left-1/2 -translate-x-1/2 border-8 border-transparent border-t-slate-900" />
                 </div>
               </div>
             </div>
 
-
-
             <div className="relative flex items-center group">
               <Globe className="absolute left-4 text-slate-500 group-focus-within:text-blue-500 transition-colors" size={20} />
-              <input
-                type="text"
-                placeholder="Enter URL (e.g., gymshark.com)"
-                className="w-full pl-12 pr-32 py-4 rounded-2xl bg-white/5 backdrop-blur-md border border-white/10 text-white placeholder:text-slate-500 focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all text-lg shadow-2xl"
-                value={url}
-                onChange={(e) => setUrl(e.target.value)}
-              />
-              <button
-                onClick={startAudit}
-                disabled={loading || !isSystemOnline}
-                className="absolute right-2 bg-blue-600 text-white px-8 py-2.5 rounded-xl font-bold hover:bg-blue-700 transition-all flex items-center gap-2 disabled:bg-slate-700 disabled:text-slate-400 shadow-lg"
-              >
+              <input type="text" placeholder="Enter URL (e.g., gymshark.com)" className="w-full pl-12 pr-32 py-4 rounded-2xl bg-white/5 backdrop-blur-md border border-white/10 text-white placeholder:text-slate-500 focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all text-lg shadow-2xl" value={url} onChange={(e) => setUrl(e.target.value)} />
+              <button onClick={startAudit} disabled={loading || !isSystemOnline} className="absolute right-2 bg-blue-600 text-white px-8 py-2.5 rounded-xl font-bold hover:bg-blue-700 transition-all flex items-center gap-2 disabled:bg-slate-700 disabled:text-slate-400 shadow-lg">
                 {loading ? <Activity className="animate-spin" size={18} /> : <Search size={18} />}
                 {loading ? 'Analyzing...' : 'Analyze'}
               </button>
             </div>
           </div>
         </section>
+
+        {/* LOADING SKELETON STATE */}
+        {loading && (
+          <div className="space-y-8 animate-in fade-in duration-500">
+            <div className="h-32 w-full bg-white/5 rounded-3xl border border-white/10 animate-pulse" />
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <SkeletonCard /><SkeletonCard /><SkeletonCard />
+            </div>
+            <div className="bg-white/5 rounded-3xl border border-white/10 overflow-hidden">
+              <div className="h-14 bg-white/10 w-full" />
+              {[1, 2, 3, 4, 5].map((i) => (
+                <div key={i} className="h-16 border-b border-white/5 w-full animate-pulse opacity-40" />
+              ))}
+            </div>
+          </div>
+        )}
 
         {error && (
           <div className="max-w-2xl mx-auto bg-red-500/10 border border-red-500/20 p-4 rounded-2xl flex items-center gap-3 text-red-400 animate-in fade-in zoom-in duration-300">
@@ -223,68 +203,28 @@ export default function Home() {
                   <p className="text-slate-500 text-[10px] font-bold uppercase tracking-widest">Monthly Revenue Baseline</p>
                 </div>
               </div>
-              <input
-                type="range"
-                min="10000"
-                max="1000000"
-                step="10000"
-                value={monthlyRevenue}
-                onChange={(e) => setMonthlyRevenue(parseInt(e.target.value))}
-                className="w-full h-2 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-blue-500"
-              />
+              <input type="range" min="10000" max="1000000" step="10000" value={monthlyRevenue} onChange={(e) => setMonthlyRevenue(parseInt(e.target.value))} className="w-full h-2 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-blue-500" />
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              
               <div className="bg-white p-6 rounded-3xl shadow-sm border border-slate-100 flex items-center justify-between group hover:border-red-200 transition-all">
-                <div className="text-left">
-                  <p className="text-xs text-slate-500 font-bold uppercase tracking-wider mb-1">Slowest Individual App</p>
-                  <h3 className="text-4xl font-black text-red-600">{results?.slowestApps?.[0]?.ms || 0}ms</h3>
-                  <p className="text-[10px] text-slate-400 mt-1 font-medium italic">Single biggest performance bottleneck</p>
-                </div>
-                <div className="bg-red-50 p-3 rounded-full text-red-600">
-                  <Zap size={24} />
-                </div>
+                <div className="text-left"><p className="text-xs text-slate-500 font-bold uppercase tracking-wider mb-1">Slowest Individual App</p><h3 className="text-4xl font-black text-red-600">{results?.slowestApps?.[0]?.ms || 0}ms</h3></div>
+                <div className="bg-red-50 p-3 rounded-full text-red-600"><Zap size={24} /></div>
               </div>
-
               <div className="bg-white p-6 rounded-3xl shadow-sm border border-slate-100 flex items-center justify-between group hover:border-blue-200 transition-all">
-                <div className="text-left">
-                  <p className="text-xs text-slate-500 font-bold uppercase tracking-wider mb-1">Total Script Bloat</p>
-                  <h3 className="text-4xl font-black text-blue-600">{(totalBloat / 1000).toFixed(2)}s</h3>
-                  <p className="text-[10px] text-slate-400 mt-1 font-medium italic">Combined delay from {results?.summary?.apps} apps</p>
-                </div>
-                <div className="bg-blue-50 p-3 rounded-full text-blue-600">
-                  <Activity size={24} />
-                </div>
+                <div className="text-left"><p className="text-xs text-slate-500 font-bold uppercase tracking-wider mb-1">Total Script Bloat</p><h3 className="text-4xl font-black text-blue-600">{(totalBloat / 1000).toFixed(2)}s</h3></div>
+                <div className="bg-blue-50 p-3 rounded-full text-blue-600"><Activity size={24} /></div>
               </div>
-
               <div className="bg-white p-6 rounded-3xl shadow-sm border border-red-100 flex items-center justify-between group relative transition-all">
-                <div className="text-left">
-                  <div className="flex items-center gap-2 mb-1">
-                    <p className="text-xs text-red-500 font-bold uppercase tracking-wider italic">Potential Revenue Loss</p>
-                    <div className="px-1.5 py-0.5 rounded bg-slate-100 text-[9px] text-slate-500 font-black tracking-tighter uppercase">
-                      BASELINE: ${(monthlyRevenue / 1000)}K/MO
-                    </div>
-                  </div>
-                  <h3 className="text-4xl font-black text-slate-900">
-                    {calculateRevenueLoss(totalBloat)}
-                    <span className="text-xs text-slate-400 font-normal ml-1 tracking-normal uppercase italic">/mo</span>
-                  </h3>
-                  <p className="mt-2 text-[10px] text-slate-400 leading-tight border-t border-slate-50 pt-2 font-medium">
-                    <span className="text-red-400 font-bold underline italic">Cumulative Impact:</span> Every 1s of total bloat = ~10% sales drop.
-                  </p>
-                </div>
-                <div className="bg-red-600 p-3 rounded-full text-white shadow-lg shadow-red-200">
-                  <TrendingDown size={24} />
-                </div>
+                <div className="text-left"><div className="flex items-center gap-2 mb-1"><p className="text-xs text-red-500 font-bold uppercase tracking-wider italic">Potential Revenue Loss</p></div><h3 className="text-4xl font-black text-slate-900">{calculateRevenueLoss(totalBloat)}<span className="text-xs text-slate-400 font-normal ml-1 italic">/mo</span></h3></div>
+                <div className="bg-red-600 p-3 rounded-full text-white"><TrendingDown size={24} /></div>
               </div>
             </div>
 
             <div className="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden text-slate-900">
               <div className="px-6 py-5 border-b border-slate-100 bg-slate-50 flex justify-between items-center">
-                <h4 className="font-bold text-slate-800 flex items-center gap-2">
-                  <AlertTriangle size={18} className="text-amber-500" />
-                  The "Wall of Shame" (Top 10 Slowest Apps)
-                </h4>
+                <h4 className="font-bold text-slate-800 flex items-center gap-2"><AlertTriangle size={18} className="text-amber-500" /> The "Wall of Shame"</h4>
                 <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">Live Audit Data</span>
               </div>
               <table className="w-full text-left">
@@ -292,7 +232,7 @@ export default function Home() {
                   <tr className="text-xs uppercase text-slate-400 font-bold border-b border-slate-100">
                     <th className="px-6 py-4">App Hostname</th>
                     <th className="px-6 py-4">Type & Recommendation</th>
-                    <th className="px-6 py-4 text-right">Network Impact</th>
+                    <th className="px-6 py-4 text-right">Impact</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-50">
