@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from 'react'; 
+import { useState, useEffect } from 'react';
 import { Search, Zap, AlertTriangle, Globe, Activity, Info, BarChart3, TrendingDown, MousePointer2, Monitor, TabletSmartphone } from 'lucide-react';
 
 // Advice database for recommendations
@@ -26,7 +26,7 @@ export default function Home() {
   const [results, setResults] = useState<any>(null);
   const [monthlyRevenue, setMonthlyRevenue] = useState(100000);
   const [device, setDevice] = useState<'desktop' | 'mobile'>('desktop');
-  
+
   //System Status State
   const [isSystemOnline, setIsSystemOnline] = useState(false);
 
@@ -41,7 +41,7 @@ export default function Home() {
         setIsSystemOnline(false);
       }
     };
-    
+
     checkStatus();
     const interval = setInterval(checkStatus, 30000);
     return () => clearInterval(interval);
@@ -97,12 +97,11 @@ export default function Home() {
         <section className="text-center space-y-10">
           <div className="space-y-6">
             {/* Dynamic Status Badge */}
-            <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-full border text-xs font-bold uppercase tracking-widest transition-all duration-500 ${
-              isSystemOnline 
-              ? 'bg-blue-500/10 border-blue-500/20 text-blue-400 animate-pulse' 
+            <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-full border text-xs font-bold uppercase tracking-widest transition-all duration-500 ${isSystemOnline
+              ? 'bg-blue-500/10 border-blue-500/20 text-blue-400 animate-pulse'
               : 'bg-red-500/10 border-red-500/20 text-red-400'
-            }`}>
-              <Activity size={14} /> 
+              }`}>
+              <Activity size={14} />
               {isSystemOnline ? 'System Online: Puppeteer Engine Active' : 'System Offline: Check Backend Connection'}
             </div>
             <h2 className="text-6xl font-black text-white leading-tight tracking-tight">
@@ -145,7 +144,7 @@ export default function Home() {
               </div>
             </div>
           </div>
-          
+
           <p className="text-[10px] text-slate-500 max-w-2xl mx-auto mt-4 italic leading-relaxed">
             * Metrics based on historical industry studies (Akamai, Google, Amazon). Actual conversion impact
             varies by industry, average order value (AOV), and customer intent. These figures are
@@ -168,7 +167,20 @@ export default function Home() {
                   <TabletSmartphone size={14} /> MOBILE (4G)
                 </button>
               </div>
+
+              <div className="group relative ml-2">
+                <Info size={16} className="text-slate-500 cursor-help hover:text-blue-400 transition-colors" />
+                <div className="absolute left-1/2 -translate-x-1/2 bottom-full mb-3 w-64 p-3 bg-slate-900 border border-white/10 rounded-xl shadow-2xl opacity-0 group-hover:opacity-100 pointer-events-none transition-all z-50 text-left">
+                  <p className="text-[11px] leading-relaxed text-slate-300">
+                    <span className="text-blue-400 font-bold block mb-1 uppercase tracking-tighter">Under the Hood:</span>
+                    Mobile mode simulates a <span className="text-white font-bold">4x slower CPU</span> and <span className="text-white font-bold">4G network latency</span> to reveal how apps perform on real-world customer devices.
+                  </p>
+                  <div className="absolute top-full left-1/2 -translate-x-1/2 border-8 border-transparent border-t-slate-900"></div>
+                </div>
+              </div>
             </div>
+
+
 
             <div className="relative flex items-center group">
               <Globe className="absolute left-4 text-slate-500 group-focus-within:text-blue-500 transition-colors" size={20} />
