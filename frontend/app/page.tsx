@@ -170,15 +170,25 @@ export default function Home() {
         {/* LOADING SKELETON STATE */}
         {loading && (
           <div className="space-y-8 animate-in fade-in duration-500">
+            <div className="max-w-md mx-auto bg-white/5 border border-white/10 rounded-2xl p-4 flex items-center gap-4">
+              <div className="relative">
+                <Activity size={24} className="text-blue-500 animate-spin" />
+                <div className="absolute inset-0 blur-sm bg-blue-500/20 animate-pulse rounded-full" />
+              </div>
+              <div className="text-left">
+                <p className="text-xs font-bold text-blue-400 uppercase tracking-widest animate-pulse">
+                  Audit in Progress
+                </p>
+                <p className="text-[11px] text-slate-500 italic">
+                  Simulating {device} hardware & intercepting 3rd party network requests...
+                </p>
+              </div>
+            </div>
+
             <div className="h-32 w-full bg-white/5 rounded-3xl border border-white/10 animate-pulse" />
+
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <SkeletonCard /><SkeletonCard /><SkeletonCard />
-            </div>
-            <div className="bg-white/5 rounded-3xl border border-white/10 overflow-hidden">
-              <div className="h-14 bg-white/10 w-full" />
-              {[1, 2, 3, 4, 5].map((i) => (
-                <div key={i} className="h-16 border-b border-white/5 w-full animate-pulse opacity-40" />
-              ))}
             </div>
           </div>
         )}
@@ -258,7 +268,7 @@ export default function Home() {
               </div>
               <table className="w-full text-left">
                 <thead>
-                  <tr className="text-xs uppercase text-slate-400 font-bold border-b border-slate-100">
+                  <tr className="text-sm uppercase text-slate-400 font-bold border-b border-slate-100">
                     <th className="px-6 py-4">App Hostname</th>
                     <th className="px-6 py-4">Type & Recommendation</th>
                     <th className="px-6 py-4 text-right">Impact</th>
@@ -271,8 +281,8 @@ export default function Home() {
                       <tr key={i} className="hover:bg-blue-500/5 transition-all duration-300 group cursor-default">
                         <td className="px-6 py-5 font-semibold text-slate-700 group-hover:text-blue-600 transition-colors">
                           <div className="flex items-center gap-2">
-                             <div className="w-1.5 h-1.5 rounded-full bg-blue-500 opacity-0 group-hover:opacity-100 transition-opacity" />
-                             {app.hostname}
+                            <div className="w-1.5 h-1.5 rounded-full bg-blue-500 opacity-0 group-hover:opacity-100 transition-opacity" />
+                            {app.hostname}
                           </div>
                         </td>
                         <td className="px-6 py-5">
