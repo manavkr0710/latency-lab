@@ -207,18 +207,47 @@ export default function Home() {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              
               <div className="bg-white p-6 rounded-3xl shadow-sm border border-slate-100 flex items-center justify-between group hover:border-red-200 transition-all">
-                <div className="text-left"><p className="text-xs text-slate-500 font-bold uppercase tracking-wider mb-1">Slowest Individual App</p><h3 className="text-4xl font-black text-red-600">{results?.slowestApps?.[0]?.ms || 0}ms</h3></div>
-                <div className="bg-red-50 p-3 rounded-full text-red-600"><Zap size={24} /></div>
+                <div className="text-left">
+                  <p className="text-xs text-slate-500 font-bold uppercase tracking-wider mb-1">Slowest Individual App</p>
+                  <h3 className="text-4xl font-black text-red-600">{results?.slowestApps?.[0]?.ms || 0}ms</h3>
+                  <p className="text-[10px] text-slate-400 mt-1 font-medium italic">Single biggest performance bottleneck</p>
+                </div>
+                <div className="bg-red-50 p-3 rounded-full text-red-600">
+                  <Zap size={24} />
+                </div>
               </div>
+
               <div className="bg-white p-6 rounded-3xl shadow-sm border border-slate-100 flex items-center justify-between group hover:border-blue-200 transition-all">
-                <div className="text-left"><p className="text-xs text-slate-500 font-bold uppercase tracking-wider mb-1">Total Script Bloat</p><h3 className="text-4xl font-black text-blue-600">{(totalBloat / 1000).toFixed(2)}s</h3></div>
-                <div className="bg-blue-50 p-3 rounded-full text-blue-600"><Activity size={24} /></div>
+                <div className="text-left">
+                  <p className="text-xs text-slate-500 font-bold uppercase tracking-wider mb-1">Total Script Bloat</p>
+                  <h3 className="text-4xl font-black text-blue-600">{(totalBloat / 1000).toFixed(2)}s</h3>
+                  <p className="text-[10px] text-slate-400 mt-1 font-medium italic">Combined delay from {results?.summary?.apps} apps</p>
+                </div>
+                <div className="bg-blue-50 p-3 rounded-full text-blue-600">
+                  <Activity size={24} />
+                </div>
               </div>
+
               <div className="bg-white p-6 rounded-3xl shadow-sm border border-red-100 flex items-center justify-between group relative transition-all">
-                <div className="text-left"><div className="flex items-center gap-2 mb-1"><p className="text-xs text-red-500 font-bold uppercase tracking-wider italic">Potential Revenue Loss</p></div><h3 className="text-4xl font-black text-slate-900">{calculateRevenueLoss(totalBloat)}<span className="text-xs text-slate-400 font-normal ml-1 italic">/mo</span></h3></div>
-                <div className="bg-red-600 p-3 rounded-full text-white"><TrendingDown size={24} /></div>
+                <div className="text-left">
+                  <div className="flex items-center gap-2 mb-1">
+                    <p className="text-xs text-red-500 font-bold uppercase tracking-wider italic">Potential Revenue Loss</p>
+                    <div className="px-1.5 py-0.5 rounded bg-slate-100 text-[9px] text-slate-500 font-black tracking-tighter uppercase">
+                      BASELINE: ${(monthlyRevenue / 1000)}K/MO
+                    </div>
+                  </div>
+                  <h3 className="text-4xl font-black text-slate-900">
+                    {calculateRevenueLoss(totalBloat)}
+                    <span className="text-xs text-slate-400 font-normal ml-1 tracking-normal uppercase italic">/mo</span>
+                  </h3>
+                  <p className="mt-2 text-[10px] text-slate-400 leading-tight border-t border-slate-50 pt-2 font-medium">
+                    <span className="text-red-400 font-bold underline italic">Cumulative Impact:</span> Every 1s of total bloat = ~10% sales drop.
+                  </p>
+                </div>
+                <div className="bg-red-600 p-3 rounded-full text-white shadow-lg shadow-red-200">
+                  <TrendingDown size={24} />
+                </div>
               </div>
             </div>
 
@@ -239,16 +268,21 @@ export default function Home() {
                   {results.slowestApps.map((app: any, i: number) => {
                     const advice = getAdvice(app.hostname);
                     return (
-                      <tr key={i} className="hover:bg-slate-50 transition-colors group">
-                        <td className="px-6 py-4 font-semibold text-slate-700 tracking-tight">{app.hostname}</td>
-                        <td className="px-6 py-4">
-                          <div className="flex flex-col gap-1 text-left">
-                            <span className={`w-fit px-2 py-0.5 rounded text-[10px] font-bold text-white uppercase ${advice.color}`}>{advice.label}</span>
-                            <p className="text-[11px] text-slate-500 leading-tight max-w-[250px]">{advice.tip}</p>
+                      <tr key={i} className="hover:bg-blue-500/5 transition-all duration-300 group cursor-default">
+                        <td className="px-6 py-5 font-semibold text-slate-700 group-hover:text-blue-600 transition-colors">
+                          <div className="flex items-center gap-2">
+                             <div className="w-1.5 h-1.5 rounded-full bg-blue-500 opacity-0 group-hover:opacity-100 transition-opacity" />
+                             {app.hostname}
                           </div>
                         </td>
-                        <td className="px-6 py-4 text-right">
-                          <span className={`px-4 py-1 rounded-full text-sm font-bold ${app.ms > 200 ? 'bg-red-100 text-red-700' : 'bg-amber-100 text-amber-700'}`}>
+                        <td className="px-6 py-5">
+                          <div className="flex flex-col gap-1">
+                            <span className={`w-fit px-2 py-0.5 rounded text-[10px] font-bold text-white uppercase ${advice.color}`}>{advice.label}</span>
+                            <p className="text-[11px] text-slate-500">{advice.tip}</p>
+                          </div>
+                        </td>
+                        <td className="px-6 py-5 text-right">
+                          <span className={`px-4 py-1.5 rounded-xl font-bold text-sm ${app.ms > 200 ? 'bg-red-50 text-red-600' : 'bg-amber-50 text-amber-600'}`}>
                             {app.ms} ms
                           </span>
                         </td>
