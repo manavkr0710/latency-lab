@@ -158,7 +158,7 @@ export default function Home() {
 
             <div className="relative flex items-center group">
               <Globe className="absolute left-4 text-slate-500 group-focus-within:text-blue-500 transition-colors" size={20} />
-              <input type="text" placeholder="Enter URL (e.g., gymshark.com)" className="w-full pl-12 pr-32 py-4 rounded-2xl bg-white/5 backdrop-blur-md border border-white/10 text-white placeholder:text-slate-500 focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all text-lg shadow-2xl" value={url} onChange={(e) => setUrl(e.target.value)} />
+              <input type="text" placeholder="Enter URL (e.g., gymshark.com)" className="w-full pl-12 pr-32 py-3 rounded-2xl bg-white/5 backdrop-blur-md border border-white/10 text-white placeholder:text-slate-500 focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all text-lg shadow-2xl" value={url} onChange={(e) => setUrl(e.target.value)} />
               <button onClick={startAudit} disabled={loading || !isSystemOnline} className="absolute right-2 bg-blue-600 text-white px-8 py-2.5 rounded-xl font-bold hover:bg-blue-700 transition-all flex items-center gap-2 disabled:bg-slate-700 disabled:text-slate-400 shadow-lg">
                 {loading ? <Activity className="animate-spin" size={18} /> : <Search size={18} />}
                 {loading ? 'Analyzing...' : 'Analyze'}
@@ -292,7 +292,7 @@ export default function Home() {
                           </div>
                         </td>
                         <td className="px-6 py-5 text-right">
-                          <span className={`px-4 py-1.5 rounded-xl font-bold text-sm ${app.ms > 200 ? 'bg-red-50 text-red-600' : 'bg-amber-50 text-amber-600'}`}>
+                          <span className={`px-4 py-1.5 rounded-xl font-black text-sm ${app.ms > 200 ? 'bg-red-50 text-red-600' : 'bg-amber-50 text-amber-600'}`}>
                             {app.ms} ms
                           </span>
                         </td>
