@@ -7,10 +7,10 @@ scans the amount of 3rd party resource types to figure out how much
 const fastify = require('fastify')({ logger: true });
 
 fastify.get('/health', async (request, reply) => {
-  return { 
-    status: 'ok', 
+  return {
+    status: 'ok',
     engine: 'puppeteer',
-    timestamp: new Date().toISOString() 
+    timestamp: new Date().toISOString()
   };
 });
 
@@ -37,21 +37,21 @@ fastify.get('/audit', async (request, reply) => {
 
   let browser;
 
-  try{
+  try {
     browser = await puppeteer.launch({ headless: "new" });
     const page = await browser.newPage();
 
     if (deviceType === 'mobile') {
-    
-    // simulate 4G network throttling
-    const client = await page.target().createCDPSession();
-    await client.send('Network.emulateNetworkConditions', {
-      offline: false,
-      latency: 150, // 150ms 4G latency
-      downloadThroughput: 1.6 * 1024 * 1024 / 8, // 1.6Mbps
-      uploadThroughput: 750 * 1024 / 8,
-    });
-  }
+
+      // simulate 4G network throttling
+      const client = await page.target().createCDPSession();
+      await client.send('Network.emulateNetworkConditions', {
+        offline: false,
+        latency: 150, // 150ms 4G latency
+        downloadThroughput: 1.6 * 1024 * 1024 / 8, // 1.6Mbps
+        uploadThroughput: 750 * 1024 / 8,
+      });
+    }
     const report = { firstParty: 0, thirdParty: [] };
     const firstPartyDomains = ['shopify.com', 'shopifycdn.com', 'myshopify.com'];
 
@@ -64,7 +64,7 @@ fastify.get('/audit', async (request, reply) => {
         const res = await req.response();
         if (res) {
           const timing = res.timing();
-          const latency = timing ? timing.receiveHeadersEnd : 0;
+          const latency = timing ? (timing.receiveHeadersEnd - timing.sendStart) : 0;
           const scriptUrl = req.url();
           const hostname = new URL(scriptUrl).hostname;
 

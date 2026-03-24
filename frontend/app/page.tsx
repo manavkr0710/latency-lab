@@ -13,6 +13,7 @@ const ADVICE_DB: Record<string, { label: string; tip: string; color: string }> =
   'klaviyo.com': { label: 'Marketing', tip: 'Delay initialization until the first mouse movement.', color: 'bg-blue-400' },
 };
 
+//anything that is not in the above list is categorized as a "Third-Party Script" with general advice.
 const getAdvice = (hostname: string) => {
   const match = Object.keys(ADVICE_DB).find(key => hostname.includes(key));
   return ADVICE_DB[match || ''] || { label: 'Third-Party', tip: 'General script: Consider deferring or using a Web Worker.', color: 'bg-slate-400' };
