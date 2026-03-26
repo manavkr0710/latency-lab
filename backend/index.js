@@ -38,7 +38,15 @@ fastify.get('/audit', async (request, reply) => {
   let browser;
 
   try {
-    browser = await puppeteer.launch({ headless: "new" });
+    browser = await puppeteer.launch({ 
+      headless: "new",
+      args: [
+        '--no-sandbox', 
+        '--disable-setuid-sandbox', 
+        '--disable-dev-shm-usage', // Prevents crashes in low-memory environments
+        '--disable-gpu'            // Standard for headless servers
+      ]
+    });
     const page = await browser.newPage();
 
     if (deviceType === 'mobile') {
