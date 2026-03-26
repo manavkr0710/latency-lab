@@ -5,6 +5,10 @@ scans the amount of 3rd party resource types to figure out how much
  
 */
 const fastify = require('fastify')({ logger: true });
+const chromium = require('@sparticuz/chromium');
+const puppeteer = require('puppeteer-core');
+const awsLambdaFastify = require('@fastify/aws-lambda');
+
 
 fastify.get('/health', async (request, reply) => {
   return {
@@ -17,10 +21,17 @@ fastify.get('/health', async (request, reply) => {
 fastify.register(require('@fastify/cors'), {
   origin: "*" //frontend will talk to this api
 });
-const puppeteer = require('puppeteer');
-
 // define the root route to test if the server is awake
 fastify.get('/audit', async (request, reply) => {
+  const apiKey = request.headers['x-api-key'];
+  const SECRET = process.env.AUDIT_SECRET; // No hardcoded string!
+
+  if (!apiKey || apiKey !== SECRET) {
+    return reply.code(401).send({
+      error: "Unauthorized",
+      message: "Invalid or missing API Key"
+    });
+  }
   let targetUrl = request.query.url;
   const deviceType = request.query.device || 'desktop';
 
@@ -38,14 +49,11 @@ fastify.get('/audit', async (request, reply) => {
   let browser;
 
   try {
-    browser = await puppeteer.launch({ 
-      headless: "new",
-      args: [
-        '--no-sandbox', 
-        '--disable-setuid-sandbox', 
-        '--disable-dev-shm-usage', // Prevents crashes in low-memory environments
-        '--disable-gpu'            // Standard for headless servers
-      ]
+    browser = await puppeteer.launch({
+      args: chromium.args,
+      defaultViewport: chromium.defaultViewport,
+      executablePath: await chromium.executablePath(),
+      headless: chromium.headless,
     });
     const page = await browser.newPage();
 
@@ -117,16 +125,19 @@ fastify.get('/audit', async (request, reply) => {
     });
   }
 });
+const proxy = awsLambdaFastify(fastify);
+exports.handler = async (event, context) => proxy(event, context);
 
-// start the server
-const start = async () => {
-  try {
-    // Port 3001, but host must be 0.0.0.0 for Docker/AWS
-    await fastify.listen({ port: 3001, host: '0.0.0.0' });
-    console.log('Server is running on port 3001');
-  } catch (err) {
-    fastify.log.error(err);
-    process.exit(1);
-  }
-};
-start();
+// --- LOCAL SERVER START (for testing) ---
+if (require.main === module) {
+  const start = async () => {
+    try {
+      await fastify.listen({ port: 3001, host: '0.0.0.0' });
+      console.log('Local Server running on port 3001');
+    } catch (err) {
+      fastify.log.error(err);
+      process.exit(1);
+    }
+  };
+  start();
+}

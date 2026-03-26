@@ -40,7 +40,7 @@ export default function Home() {
   useEffect(() => {
     const checkStatus = async () => {
       try {
-        const res = await fetch('http://localhost:3001/health');
+        const res = await fetch('https://2sstn25gtnro7ha6i2h4j7r66a0yxsym.lambda-url.us-east-1.on.aws/health');
         if (res.ok) setIsSystemOnline(true);
         else setIsSystemOnline(false);
       } catch (err) {
@@ -71,8 +71,13 @@ export default function Home() {
     try {
       // ensure the URL includes the protocol if the user forgot it
       const formattedUrl = url.startsWith('http') ? url : `https://${url}`;
-      
-      const response = await fetch(`http://localhost:3001/audit?url=${formattedUrl}&device=${device}`);
+
+      const response = await fetch(`https://2sstn25gtnro7ha6i2h4j7r66a0yxsym.lambda-url.us-east-1.on.aws/audit?url=${formattedUrl}&device=${device}`, {
+        headers: {
+          // This will be empty on your laptop until you set it up
+          'x-api-key': process.env.NEXT_PUBLIC_AUDIT_SECRET || 'fallback_key_for_local_dev'
+        }
+      });
       const data = await response.json();
 
       if (!response.ok) {
@@ -141,7 +146,7 @@ export default function Home() {
               </div>
             ))}
           </div>
-          
+
           <p className="text-[10px] text-slate-500 max-w-2xl mx-auto mt-4 italic leading-relaxed">
             * Metrics based on historical industry studies (Akamai, Google, Amazon). Actual conversion impact
             varies by industry, average order value (AOV), and customer intent. These figures are
