@@ -138,7 +138,12 @@ export default function Home() {
               </div>
             ))}
           </div>
-
+          
+          <p className="text-[10px] text-slate-500 max-w-2xl mx-auto mt-4 italic leading-relaxed">
+            * Metrics based on historical industry studies (Akamai, Google, Amazon). Actual conversion impact
+            varies by industry, average order value (AOV), and customer intent. These figures are
+            simulated estimates intended for performance benchmarking.
+          </p>
           <div className="max-w-2xl mx-auto space-y-6">
             <div className="flex justify-center items-center gap-2">
               <div className="bg-white/5 p-1 rounded-2xl border border-white/10 flex gap-1">
