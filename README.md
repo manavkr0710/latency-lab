@@ -1,11 +1,34 @@
 # Latency Lab 
 
+<img width="1294" height="596" alt="image" src="https://github.com/user-attachments/assets/cad170e3-ea46-4e01-ba5c-a08118c95390" />
+
+
+
 Latency Lab is a network diagnostic tool that gives Shopify DTC merchants a "performance reality check" by monitoring the browser’s **Main Thread**. It identifies the hidden "Performance Tax" caused by third-party apps like chatbots, widgets, and tracking pixels. 
 
 By pinpointing the specific **App Bloat** that drives up mobile bounce rates, Latency Lab reveals exactly which integrations are costing merchants sales before a customer even interacts.
 
 In a nutshell, Latency Lab tells the merchant why the user left before they could even do anything.
 
+---
+
+## How it works
+
+### 1. Enter a link (that is hosted on Shopify)
+
+<img width="736" height="175" alt="image" src="https://github.com/user-attachments/assets/84e1da0b-8d8d-4dbd-b230-40d2d7d229f4" />
+
+
+### 2. Wait (can take a few seconds)
+
+<img width="1132" height="426" alt="image" src="https://github.com/user-attachments/assets/4a9b034e-02cb-49fe-9e15-ced75316dc3d" />
+
+
+### 3. View Results
+
+<img width="694" height="566" alt="image" src="https://github.com/user-attachments/assets/293b2c81-c8e1-4d5c-90d0-f0a208d3ea9f" />
+
+#### Note: May have to run multiple times for accurate results since first time run may also include cold start delay, which would affect the final latency results.
 ---
 
 ## Tech Stack
