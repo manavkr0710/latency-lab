@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect } from 'react';
 import { Search, Zap, AlertTriangle, Globe, Activity, Info, BarChart3, TrendingDown, MousePointer2, Monitor, TabletSmartphone } from 'lucide-react';
-
+import GYMSHARK_MOCK_DATA from '../data/mockData.json';
 // Advice database for recommendations
 const ADVICE_DB: Record<string, { label: string; tip: string; color: string }> = {
   'connect.facebook.net': { label: 'Tracking Pixel', tip: 'Move to Server-Side GTM to save 200ms+ of browser load.', color: 'bg-blue-500' },
@@ -29,6 +29,7 @@ const SkeletonCard = () => (
 );
 
 export default function Home() {
+  const [isDemoMode, setIsDemoMode] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [url, setUrl] = useState('');
   const [loading, setLoading] = useState(false);
@@ -67,21 +68,27 @@ export default function Home() {
     setLoading(true);
     setError(null);
     setResults(null);
+    setIsDemoMode(false); 
 
     try {
-      // ensure the URL includes the protocol if the user forgot it
       const formattedUrl = url.startsWith('http') ? url : `https://${url}`;
-      
       const response = await fetch(`http://localhost:3001/audit?url=${formattedUrl}&device=${device}`);
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.message || "Audit failed. Ensure the URL is correct.");
+      
+      if (response.ok) {
+        const data = await response.json();
+        setResults(data); 
+      } else {
+        throw new Error("Backend Error");
       }
-      setResults(data);
+
     } catch (err: any) {
-      setError(err.message);
-      console.error("Audit failed", err);
+      // Server is offline (e.g., Docker isn't running)
+      console.warn("Backend offline, showing demo data instead.");
+      
+      setIsDemoMode(true); 
+      
+      setResults(GYMSHARK_MOCK_DATA);
+      
     } finally {
       setLoading(false);
     }
