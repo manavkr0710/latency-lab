@@ -88,13 +88,10 @@ export default function Home() {
 
   return (
     <main className="min-h-screen bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-slate-900 via-slate-950 to-black text-slate-100 font-sans">
-      <nav className="border-b border-white/10 bg-black/50 backdrop-blur-md px-8 py-4 flex justify-between items-center shadow-sm sticky top-0 z-50">
+      <nav className="border-b border-white/10 bg-black/50 backdrop-blur-md px-8 py-4 flex justify-center items-center shadow-sm sticky top-0 z-50">
         <div className="flex items-center gap-2 font-bold text-xl text-blue-500">
           <Zap size={24} fill="currentColor" />
           <span>Latency Lab</span>
-        </div>
-        <div className="text-sm font-medium text-slate-500 uppercase tracking-wider">
-          Shopify App Auditor v1.0
         </div>
       </nav>
 
@@ -221,7 +218,7 @@ export default function Home() {
               <div className="bg-white p-6 rounded-3xl shadow-sm border border-slate-100 flex items-center justify-between group hover:border-red-200 transition-all">
                 <div className="text-left">
                   <p className="text-xs text-slate-500 font-bold uppercase tracking-wider mb-1">Slowest Individual App</p>
-                  <h3 className="text-4xl font-black text-red-600">{results?.slowestApps?.[0]?.ms || 0}ms</h3>
+                  <h3 className="text-4xl font-black text-red-600">{(results?.slowestApps?.[0]?.ms || 0).toFixed(2)}ms</h3>
                   <p className="text-[10px] text-slate-400 mt-1 font-medium italic">Single biggest performance bottleneck</p>
                 </div>
                 <div className="bg-red-50 p-3 rounded-full text-red-600">
@@ -294,7 +291,7 @@ export default function Home() {
                         </td>
                         <td className="px-6 py-5 text-right">
                           <span className={`px-4 py-1.5 rounded-xl font-black text-sm ${app.ms > 200 ? 'bg-red-50 text-red-600' : 'bg-amber-50 text-amber-600'}`}>
-                            {app.ms} ms
+                            {app.ms.toFixed(2)} ms
                           </span>
                         </td>
                       </tr>
