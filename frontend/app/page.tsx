@@ -303,6 +303,15 @@ export default function Home() {
                     );
                   })}
                 </tbody>
+                <tfoot>
+                  <tr className="bg-amber-50 text-amber-800 text-sm font-semibold">
+                    <td colSpan={3} className="px-6 py-3 border-t border-amber-200">
+                      <span className="inline-flex items-center gap-2 text-xs ">
+                        <strong>Disclaimer:</strong> The "Wall of Shame" shows relative script impacts using live audit timing data. Actual performance may differ across networks, devices, and browser versions.
+                      </span>
+                    </td>
+                  </tr>
+                </tfoot>
               </table>
             </div>
           </div>
