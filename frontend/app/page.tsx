@@ -69,11 +69,14 @@ export default function Home() {
     setResults(null);
 
     try {
-      const response = await fetch(`http://localhost:3001/audit?url=${url}&device=${device}`);
+      // ensure the URL includes the protocol if the user forgot it
+      const formattedUrl = url.startsWith('http') ? url : `https://${url}`;
+      
+      const response = await fetch(`http://localhost:3001/audit?url=${formattedUrl}&device=${device}`);
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.message || "Something went wrong");
+        throw new Error(data.message || "Audit failed. Ensure the URL is correct.");
       }
       setResults(data);
     } catch (err: any) {
