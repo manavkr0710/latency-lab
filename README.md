@@ -12,7 +12,7 @@ In a nutshell, Latency Lab tells the merchant why the user left before they coul
 
 
 * **Frontend:** Built with **Next.js 14/15** and **Tailwind CSS**
-* **Audit Engine (The "Core"):** A **Fastify (Node.js)** server that orchestrates a **Headless Chromium** instance via **Puppeteer**.
+* **Backend/Audit Engine:** A **Fastify (Node.js)** server that orchestrates a **Headless Chromium** instance via **Puppeteer**.
 * **Infrastructure:** The backend is **Dockerized** to handle complex Linux dependencies required by Chrome, ensuring the audit environment is identical across local development and **AWS App Runner**.
 * **CI/CD:** Automated deployment pipeline using **GitHub Actions** to build and push Docker images to the cloud.
 
