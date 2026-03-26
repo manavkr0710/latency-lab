@@ -19,8 +19,11 @@
   },
   "homepage": "https://github.com/manavkr0710/latency-lab#readme",
   "dependencies": {
+    "@fastify/aws-lambda": "^6.4.0",
     "@fastify/cors": "^11.2.0",
+    "@sparticuz/chromium": "^143.0.4",
     "fastify": "^5.8.2",
-    "puppeteer": "^24.40.0"
+    "puppeteer": "^24.40.0",
+    "puppeteer-core": "^24.40.0"
   }
 }
