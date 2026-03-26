@@ -34,7 +34,7 @@ In a nutshell, Latency Lab tells the merchant why the user left before they coul
 ## Tech Stack
 
 
-* **Frontend:** Built with **Next.js 14/15** and **Tailwind CSS**
+* **Frontend:** Built with **React**, **Next.js 14/15** and **Tailwind CSS**
 * **Backend/Audit Engine:** A **Fastify (Node.js)** server that orchestrates a **Headless Chromium** instance via **Puppeteer**.
 * **Containerization**: **Docker** used to package the Chromium engine and Linux system dependencies into a portable image.
 
