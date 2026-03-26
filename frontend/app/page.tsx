@@ -13,6 +13,8 @@ const ADVICE_DB: Record<string, { label: string; tip: string; color: string }> =
   'klaviyo.com': { label: 'Marketing', tip: 'Delay initialization until the first mouse movement.', color: 'bg-blue-400' },
 };
 
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+
 //anything that is not in the above list is categorized as a "Third-Party Script" with general advice.
 const getAdvice = (hostname: string) => {
   const match = Object.keys(ADVICE_DB).find(key => hostname.includes(key));
@@ -40,8 +42,7 @@ export default function Home() {
   useEffect(() => {
     const checkStatus = async () => {
       try {
-        const res = await fetch('https://2sstn25gtnro7ha6i2h4j7r66a0yxsym.lambda-url.us-east-1.on.aws/health');
-        if (res.ok) setIsSystemOnline(true);
+        const res = await fetch(`${API_BASE_URL}/health`); if (res.ok) setIsSystemOnline(true);
         else setIsSystemOnline(false);
       } catch (err) {
         setIsSystemOnline(false);
@@ -72,9 +73,8 @@ export default function Home() {
       // ensure the URL includes the protocol if the user forgot it
       const formattedUrl = url.startsWith('http') ? url : `https://${url}`;
 
-      const response = await fetch(`https://2sstn25gtnro7ha6i2h4j7r66a0yxsym.lambda-url.us-east-1.on.aws/audit?url=${formattedUrl}&device=${device}`, {
+      const response = await fetch(`${API_BASE_URL}/audit?url=${formattedUrl}&device=${device}`, {
         headers: {
-          // This will be empty on your laptop until you set it up
           'x-api-key': process.env.NEXT_PUBLIC_AUDIT_SECRET || 'fallback_key_for_local_dev'
         }
       });
